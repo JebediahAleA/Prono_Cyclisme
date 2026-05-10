@@ -484,15 +484,8 @@ function renderAll(){
   curScores = scores;
   const sorted = Object.entries(scores).sort((a,b) => b[1].total - a[1].total);
 
-  // Alertes réserviste
-  const az = document.getElementById('alerts');
-  az.innerHTML = '';
-  for(const [name, data] of Object.entries(scores)){
-    const prono = PRONOSTICS[name];
-    if(data.replacedName && data.resActif){
-      az.innerHTML += `<div class="alert-info"><strong>${name}</strong> — Réserviste activé : ${prono.res} remplace ${data.replacedName} (meilleur classé parmi les abandons).</div>`;
-    }
-  }
+  // Alertes réserviste supprimées — info disponible dans le détail
+  document.getElementById('alerts').innerHTML = '';
 
   // Cartes classement
   const cards = document.getElementById('cards');
@@ -596,10 +589,11 @@ function showDetail(name){
     </tr>`;
   }
 
-  // Coureur remplacé
+  // Coureur remplacé avec rang dans le pronostic initial
   if(data.resActif && data.replacedName){
+    const replacedRank = prono.top10.indexOf(data.replacedName) + 1;
     tb.innerHTML += `<tr class="replaced-row">
-      <td colspan="4" style="padding:7px 12px">↳ Remplace ${data.replacedName} (abandonné)</td>
+      <td colspan="4" style="padding:7px 12px">↳ Remplace (${replacedRank}) ${data.replacedName} (Hors course)</td>
     </tr>`;
   }
 
