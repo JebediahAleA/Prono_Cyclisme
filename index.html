@@ -47,10 +47,10 @@ body{font-family:system-ui,sans-serif;background:#f8f8f6;color:#1a1a1a;padding:1
 .bucket{border-radius:8px;padding:7px 10px}
 .bucket-val{font-size:20px;font-weight:700;line-height:1}
 .bucket-lbl{font-size:10px;line-height:1.4;margin-top:2px}
-.b-green {background:#dcfce7;color:#166534}
-.b-lime  {background:#f0fdf4;color:#15803d;border:1px solid #bbf7d0}
+.b-green{background:#dcfce7;color:#166534}
+.b-lime{background:#f0fdf4;color:#15803d;border:1px solid #bbf7d0}
 .b-orange{background:#ffedd5;color:#9a3412}
-.b-red   {background:#fee2e2;color:#991b1b}
+.b-red{background:#fee2e2;color:#991b1b}
 .tbl-wrap{background:#fff;border:1px solid #e5e5e5;border-radius:12px;overflow:hidden;margin-bottom:1rem}
 .tbl{width:100%;border-collapse:collapse}
 .tbl thead tr{background:#f8f8f6}
@@ -60,25 +60,23 @@ body{font-family:system-ui,sans-serif;background:#f8f8f6;color:#1a1a1a;padding:1
 .pb{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;font-size:12px;font-weight:500}
 .p1{background:#fef9c3;color:#854d0e}.p2{background:#f1f5f9;color:#334155}.p3{background:#fff7ed;color:#92400e}.pN{background:#f0f0f0;color:#666}
 .ptag{font-size:11px;padding:2px 8px;border-radius:20px;background:#fde8ec;color:#9b1c1c;margin-left:6px}
-.dnftag{font-size:11px;padding:2px 7px;border-radius:20px;background:#fef9c3;color:#854d0e;margin-left:6px}
+.dnftag{font-size:11px;padding:2px 7px;border-radius:20px;background:#f3f4f6;color:#666;margin-left:6px}
 .back-btn{display:flex;align-items:center;gap:10px;margin-bottom:1.5rem;cursor:pointer;color:#666;font-size:14px}
 .back-btn:hover{color:#1a1a1a}
 .detail-title{font-size:18px;font-weight:500;color:#1a1a1a}
 .dtbl th{font-size:12px;font-weight:500;color:#666;padding:8px 12px;background:#f8f8f6;text-align:left}
 .dtbl td{font-size:13px;padding:9px 12px;border-top:1px solid #f0f0f0;color:#1a1a1a}
 .dtbl td:last-child{text-align:right;font-weight:500}
-.tot-row td{font-weight:600;font-size:14px;background:#f8f8f6 !important}
+.tot-row td{font-weight:600;font-size:14px;background:#f8f8f6 !important;color:#1a1a1a !important}
 .mult{font-size:11px;color:#999;margin-left:4px}
 .rtag{font-size:11px;padding:1px 6px;border-radius:10px;background:#fde8ec;color:#9b1c1c;margin-left:5px}
-/* Couleurs lignes tableau détail */
-.row-top10  td{background:#dcfce7}
-.row-top15  td{background:#f0fdf4}
+.row-top10 td{background:#dcfce7}
+.row-top15 td{background:#f0fdf4}
 .row-near15 td{background:#fef9c3}
-.row-far15  td{background:#ffedd5}
-.row-lost   td{background:#fee2e2}
-.row-dnf    td{background:#f3f4f6;color:#888}
+.row-far15 td{background:#ffedd5}
+.row-lost td{background:#fee2e2}
+.row-dnf td{background:#f3f4f6;color:#888}
 .replaced-row td{background:#f3f4f6;color:#888;font-style:italic;font-size:12px}
-/* Légende */
 .legend{display:flex;flex-wrap:wrap;gap:8px;margin-top:1rem;font-size:11px;color:#555;padding:10px 12px;background:#fff;border:1px solid #e5e5e5;border-radius:8px}
 .legend-item{display:flex;align-items:center;gap:5px}
 .legend-dot{width:12px;height:12px;border-radius:3px;flex-shrink:0}
@@ -86,6 +84,13 @@ body{font-family:system-ui,sans-serif;background:#f8f8f6;color:#1a1a1a;padding:1
 .detail-view{display:none}.detail-view.active{display:block}
 .alert{background:#fef3c7;border:1px solid #fde68a;border-radius:8px;padding:10px 14px;font-size:13px;color:#92400e;margin-bottom:.75rem}
 .alert-info{background:#f8f8f6;border-radius:8px;padding:10px 14px;font-size:13px;color:#666;margin-bottom:.75rem}
+.sync-bar{display:flex;align-items:center;justify-content:space-between;background:#f0f0ee;border-radius:8px;padding:8px 14px;margin-bottom:1.25rem;font-size:12px;color:#666;gap:10px;flex-wrap:wrap}
+.sync-dot{width:8px;height:8px;border-radius:50%;background:#22c55e;flex-shrink:0}
+.sync-dot.loading{background:#f59e0b;animation:pulse 1s infinite}
+.sync-dot.error{background:#e8052b}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.sync-btn{font-size:12px;padding:4px 10px;cursor:pointer;border-radius:6px;border:1px solid #ddd;background:#fff;color:#333;white-space:nowrap}
+.sync-btn:hover{background:#f0f0f0}
 </style>
 </head>
 <body>
@@ -106,6 +111,14 @@ body{font-family:system-ui,sans-serif;background:#f8f8f6;color:#1a1a1a;padding:1
 
 <div id="stage-hd"></div>
 
+<div class="sync-bar">
+  <div style="display:flex;align-items:center;gap:8px">
+    <div class="sync-dot loading" id="sdot"></div>
+    <span id="stxt">Chargement…</span>
+  </div>
+  <button class="sync-btn" onclick="loadAllStages()">&#8635; Actualiser</button>
+</div>
+
 <div class="tabs">
   <button class="tab active" onclick="showTab('classement',this)">Classement</button>
   <button class="tab" onclick="showTab('gc',this)">Classement général</button>
@@ -116,16 +129,12 @@ body{font-family:system-ui,sans-serif;background:#f8f8f6;color:#1a1a1a;padding:1
   <div id="alerts"></div>
   <div class="grid2" id="cards"></div>
 </div>
-
 <div id="tab-gc" class="section">
   <div class="tbl-wrap">
-    <table class="tbl">
-      <thead><tr><th>Pos.</th><th>Coureur</th><th>Équipe</th><th>Écart</th></tr></thead>
-      <tbody id="gc-body"></tbody>
-    </table>
+    <table class="tbl"><thead><tr><th>Pos.</th><th>Coureur</th><th>Équipe</th><th>Écart</th></tr></thead>
+    <tbody id="gc-body"></tbody></table>
   </div>
 </div>
-
 <div id="tab-pronostics" class="section">
   <div class="grid2" id="prono-list"></div>
   <div class="detail-view" id="prono-detail">
@@ -141,28 +150,36 @@ body{font-family:system-ui,sans-serif;background:#f8f8f6;color:#1a1a1a;padding:1
       <div class="legend-item"><div class="legend-dot" style="background:#dcfce7"></div> Top 10</div>
       <div class="legend-item"><div class="legend-dot" style="background:#f0fdf4;border:1px solid #bbf7d0"></div> 11e–15e place</div>
       <div class="legend-item"><div class="legend-dot" style="background:#fef9c3"></div> À moins de 3 min de la 15e place</div>
-      <div class="legend-item"><div class="legend-dot" style="background:#ffedd5"></div> À 3–15 min de la 15e place</div>
-      <div class="legend-item"><div class="legend-dot" style="background:#fee2e2"></div> À plus de 15 min de la 15e place</div>
-      <div class="legend-item"><div class="legend-dot" style="background:#f3f4f6;border:1px solid #ddd"></div> Hors course (DNF/DNS)</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#ffedd5"></div> Distancés (3–15 min)</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#fee2e2"></div> À plus de 15 min</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#f3f4f6;border:1px solid #ddd"></div> Hors course (DNF)</div>
     </div>
   </div>
 </div>
 </div>
 
 <script>
-const MULTS=[10,9,8,6,5.5,5,4.5,4,3.5,3];
-const PTS_GC={1:15,2:13,3:11,4:9,5:8,6:7,7:6,8:5,9:4,10:3,11:2,12:2,13:1.5,14:1.5,15:1.5};
+// ═══════════════════════════════════════════════════════════════
+// CONFIG
+// ═══════════════════════════════════════════════════════════════
+const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbzU8b3JYEPFHg-dA9YO83hHBR_ktnJ_ao_jbeironp1VyqrDtTz2b113EtjpG62i6nf/exec';
 
-const PRONOSTICS={
-  Franziska:{top10:['J. Vingegaard','A. Yates','G. Pellizzari','E. Bernal','F. Gall','E. Mas','B. O\'Connor','J.A. Cepeda','G. Ciccone','M. Storer'],res:'S. Kuss'},
-  Gérard:   {top10:['J. Vingegaard','A. Yates','G. Pellizzari','F. Gall','B. O\'Connor','M. Storer','T. Arensman','S. Buitrago','J. Vine','J. Hindley'],res:'E. Bernal'},
-  Mathias:  {top10:['J. Vingegaard','G. Pellizzari','E. Bernal','F. Gall','T. Arensman','D. Gee-West','A. Yates','M. Storer','B. O\'Connor','E. Mas'],res:'F. Zana'},
-  Quentin:  {top10:['J. Vingegaard','G. Pellizzari','F. Gall','J. Hindley','E. Bernal','T. Arensman','A. Pinarello','D. Gee-West','A. Yates','B. O\'Connor'],res:'D. Caruso'},
-  Yannick:  {top10:['J. Vingegaard','G. Pellizzari','F. Gall','E. Bernal','B. O\'Connor','A. Yates','D. Gee-West','G. Ciccone','T. Arensman','J. Hindley'],res:'E. Mas'},
-  Zoé:      {top10:['J. Vingegaard','G. Pellizzari','J. Hindley','D. Gee-West','A. Pinarello','A. Yates','T. Arensman','F. Gall','B. O\'Connor','E. Bernal'],res:'J. Vine'}
+// ═══════════════════════════════════════════════════════════════
+// DONNÉES STATIQUES
+// ═══════════════════════════════════════════════════════════════
+const MULTS = [10,9,8,6,5.5,5,4.5,4,3.5,3];
+const PTS_GC = {1:15,2:13,3:11,4:9,5:8,6:7,7:6,8:5,9:4,10:3,11:2,12:2,13:1.5,14:1.5,15:1.5};
+
+const PRONOSTICS = {
+  Franziska: {top10:['J. Vingegaard','A. Yates','G. Pellizzari','E. Bernal','F. Gall','E. Mas','B. O\'Connor','J.A. Cepeda','G. Ciccone','M. Storer'],res:'S. Kuss'},
+  Gérard:    {top10:['J. Vingegaard','A. Yates','G. Pellizzari','F. Gall','B. O\'Connor','M. Storer','T. Arensman','S. Buitrago','J. Vine','J. Hindley'],res:'E. Bernal'},
+  Mathias:   {top10:['J. Vingegaard','G. Pellizzari','E. Bernal','F. Gall','T. Arensman','D. Gee-West','A. Yates','M. Storer','B. O\'Connor','E. Mas'],res:'F. Zana'},
+  Quentin:   {top10:['J. Vingegaard','G. Pellizzari','F. Gall','J. Hindley','E. Bernal','T. Arensman','A. Pinarello','D. Gee-West','A. Yates','B. O\'Connor'],res:'D. Caruso'},
+  Yannick:   {top10:['J. Vingegaard','G. Pellizzari','F. Gall','E. Bernal','B. O\'Connor','A. Yates','D. Gee-West','G. Ciccone','T. Arensman','J. Hindley'],res:'E. Mas'},
+  Zoé:       {top10:['J. Vingegaard','G. Pellizzari','J. Hindley','D. Gee-West','A. Pinarello','A. Yates','T. Arensman','F. Gall','B. O\'Connor','E. Bernal'],res:'J. Vine'}
 };
 
-const STAGES=[
+const STAGES = [
   {n:1, date:'08.05.2026',dep:'Nessebar',           arr:'Burgas',           km:147,  type:'t-plat',label:'Plat'},
   {n:2, date:'09.05.2026',dep:'Burgas',              arr:'Veliko Tarnovo',   km:221,  type:'t-acc', label:'Accidentée'},
   {n:3, date:'10.05.2026',dep:'Plovdiv',             arr:'Sofia',            km:175,  type:'t-plat',label:'Plat'},
@@ -186,176 +203,255 @@ const STAGES=[
   {n:21,date:'31.05.2026',dep:'Rome',                arr:'Rome',             km:131,  type:'t-plat',label:'Plat'},
 ];
 
-// GC avec gapSec = écart en secondes par rapport au leader
-const GC1=[
-  {pos:1, name:'P. Magnier',      team:'Soudal QS',    time:'en tête',gapSec:0},
-  {pos:2, name:'T.L. Andresen',   team:'Soudal QS',    time:'+0:00',  gapSec:0},
-  {pos:3, name:'J. Milan',        team:'Lidl-Trek',    time:'+0:00',  gapSec:0},
-  {pos:4, name:'G. Thomas Silva', team:'XDS Astana',   time:'+0:00',  gapSec:0},
-  {pos:5, name:'E. Vernon',       team:'NSN',          time:'+0:00',  gapSec:0},
-  {pos:6, name:'J. Kulset',       team:'Uno-X',        time:'+0:00',  gapSec:0},
-  {pos:7, name:'M. Tjøtta',       team:'Uno-X',        time:'+0:00',  gapSec:0},
-  {pos:8, name:'L. Van Eetvelt',  team:'Lotto',        time:'+0:00',  gapSec:0},
-  {pos:9, name:'D. Rafferty',     team:'EF',           time:'+0:00',  gapSec:0},
-  {pos:10,name:'J. Christen',     team:'UAE',          time:'+0:00',  gapSec:0},
-  {pos:11,name:'J. Hirt',         team:'Astana',       time:'+0:00',  gapSec:0},
-  {pos:12,name:'J. Hindley',      team:'Red Bull-Bora',time:'+0:00',  gapSec:0},
-  {pos:13,name:'C. Scaroni',      team:'XDS Astana',   time:'+0:00',  gapSec:0},
-  {pos:14,name:'D. Caruso',       team:'Bahrain',      time:'+0:00',  gapSec:0},
-  {pos:15,name:'E. Mas',          team:'Cofidis',      time:'+0:00',  gapSec:0},
-  {pos:16,name:'J. Vingegaard',   team:'Visma',        time:'+0:00',  gapSec:0},
-  {pos:17,name:'B. O\'Connor',    team:'Jayco',        time:'+0:00',  gapSec:0},
-  {pos:18,name:'J.P. López',      team:'Movistar',     time:'+0:00',  gapSec:0},
-  {pos:19,name:'J. Romo',         team:'Astana',       time:'+0:00',  gapSec:0},
-  {pos:20,name:'E. Rubio',        team:'Movistar',     time:'+0:00',  gapSec:0},
-  {pos:21,name:'G. Ciccone',      team:'Lidl-Trek',    time:'+0:00',  gapSec:0},
-  {pos:22,name:'T. Arensman',     team:'Ineos',        time:'+0:00',  gapSec:0},
-  {pos:23,name:'E. Bernal',       team:'Ineos',        time:'+0:00',  gapSec:0},
-  {pos:24,name:'M. Storer',       team:'Tudor',        time:'+0:00',  gapSec:0},
-  {pos:25,name:'F. Gall',         team:'Decathlon',    time:'+0:00',  gapSec:0},
-  {pos:26,name:'G. Pellizzari',   team:'Red Bull-Bora',time:'+0:00',  gapSec:0},
-  {pos:27,name:'A. Yates',        team:'UAE',          time:'+0:00',  gapSec:0},
-  {pos:28,name:'D. Gee-West',     team:'UAE',          time:'+0:00',  gapSec:0},
-  {pos:29,name:'J.A. Cepeda',     team:'Movistar',     time:'+0:00',  gapSec:0},
-  {pos:30,name:'S. Buitrago',     team:'Bahrain',      time:'+0:00',  gapSec:0},
+// ═══════════════════════════════════════════════════════════════
+// ÉTAT DE L'APPLICATION
+// ═══════════════════════════════════════════════════════════════
+let allData    = {};   // {1: {gc, dnf}, 2: {gc, dnf}, ...}
+let curStage   = 1;
+let curTab     = 'classement';
+let curScores  = {};
+let lastAvail  = 0;   // dernière étape disponible
+
+// ═══════════════════════════════════════════════════════════════
+// CORRESPONDANCE DES NOMS
+// ═══════════════════════════════════════════════════════════════
+const ALIASES = [
+  ['a. pinarello', 'pinarello alessandro'],
+  ['j. vine', 'vine jay'],
+  ['s. kuss', 'kuss sepp'],
+  ['f. zana', 'zana filippo'],
+  ['d. gee-west', 'gee-west derek'],
+  ['b. o\'connor', 'o\'connor ben'],
+  ['j.a. cepeda', 'cepeda alexander'],
+  ['j. vingegaard', 'vingegaard jonas'],
+  ['a. yates', 'yates adam'],
+  ['g. pellizzari', 'pellizzari giulio'],
+  ['e. bernal', 'bernal egan'],
+  ['f. gall', 'gall felix'],
+  ['e. mas', 'mas enric'],
+  ['m. storer', 'storer michael'],
+  ['t. arensman', 'arensman thymen'],
+  ['s. buitrago', 'buitrago santiago'],
+  ['j. hindley', 'hindley jai'],
+  ['g. ciccone', 'ciccone giulio'],
+  ['d. caruso', 'caruso damiano'],
+  ['g. thomas silva', 'silva thomas'],
+  ['t.l. andresen', 'lund andresen tobias'],
+  ['s. kuss', 'kuss sepp'],
 ];
 
-// Étape 2 : 15e place = E. Mas à +10s du leader
-const GC2=[
-  {pos:1, name:'G. Thomas Silva', team:'XDS Astana',   time:'en tête', gapSec:0},
-  {pos:2, name:'F. Stork',        team:'Tudor',        time:'+0:04',   gapSec:4},
-  {pos:3, name:'E. Bernal',       team:'Ineos',        time:'+0:04',   gapSec:4},
-  {pos:4, name:'T. Arensman',     team:'Ineos',        time:'+0:06',   gapSec:6},
-  {pos:5, name:'G. Ciccone',      team:'Lidl-Trek',    time:'+0:06',   gapSec:6},
-  {pos:6, name:'J. Christen',     team:'UAE',          time:'+0:10',   gapSec:10},
-  {pos:7, name:'J. Kulset',       team:'Uno-X',        time:'+0:10',   gapSec:10},
-  {pos:8, name:'L. Van Eetvelt',  team:'Lotto',        time:'+0:10',   gapSec:10},
-  {pos:9, name:'M. Tjøtta',       team:'Uno-X',        time:'+0:10',   gapSec:10},
-  {pos:10,name:'D. Rafferty',     team:'EF',           time:'+0:10',   gapSec:10},
-  {pos:11,name:'J. Hirt',         team:'Astana',       time:'+0:10',   gapSec:10},
-  {pos:12,name:'J. Hindley',      team:'Red Bull-Bora',time:'+0:10',   gapSec:10},
-  {pos:13,name:'C. Scaroni',      team:'XDS Astana',   time:'+0:10',   gapSec:10},
-  {pos:14,name:'D. Caruso',       team:'Bahrain',      time:'+0:10',   gapSec:10},
-  {pos:15,name:'E. Mas',          team:'Cofidis',      time:'+0:10',   gapSec:10},
-  {pos:16,name:'J. Vingegaard',   team:'Visma',        time:'+0:10',   gapSec:10},
-  {pos:17,name:'B. O\'Connor',    team:'Jayco',        time:'+0:10',   gapSec:10},
-  {pos:18,name:'J.P. López',      team:'Movistar',     time:'+0:10',   gapSec:10},
-  {pos:19,name:'J. Romo',         team:'Astana',       time:'+0:10',   gapSec:10},
-  {pos:20,name:'E. Rubio',        team:'Movistar',     time:'+0:10',   gapSec:10},
-  {pos:21,name:'M. Storer',       team:'Tudor',        time:'+0:10',   gapSec:10},
-  {pos:22,name:'F. Gall',         team:'Decathlon',    time:'+0:10',   gapSec:10},
-  {pos:23,name:'G. Pellizzari',   team:'Red Bull-Bora',time:'+0:10',   gapSec:10},
-  {pos:24,name:'T. Arensman',     team:'Ineos',        time:'+0:10',   gapSec:10},
-  {pos:25,name:'G. Ciccone',      team:'Lidl-Trek',    time:'+0:10',   gapSec:10},
-  {pos:26,name:'J.A. Cepeda',     team:'Movistar',     time:'+0:10',   gapSec:10},
-  {pos:27,name:'S. Buitrago',     team:'Bahrain',      time:'+0:10',   gapSec:10},
-  {pos:28,name:'E. Bernal',       team:'Ineos',        time:'+0:10',   gapSec:10},
-  {pos:29,name:'J.P. López',      team:'Movistar',     time:'+0:10',   gapSec:10},
-  {pos:30,name:'E. Rubio',        team:'Movistar',     time:'+0:10',   gapSec:10},
-  {pos:41,name:'D. Gee-West',     team:'UAE',          time:'+1:11',   gapSec:71},
-  {pos:99,name:'A. Yates',        team:'UAE',          time:'+13:46',  gapSec:826},
-];
+function normStr(s){
+  return s.toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+    .replace(/[^a-z]/g,'');
+}
 
-const HISTORY={
-  1:{gc:GC1, dnf:['Matteo Moschetti'], dnfSameAsRes:{}},
-  2:{gc:GC2, dnf:['J. Vine','M. Soler','Å. Holter'], dnfSameAsRes:{'Zoé':true}}
-};
+function lastName(s){
+  const parts = s.trim().split(/[\s\-]+/).filter(x => x.length > 1);
+  return parts[parts.length - 1] || '';
+}
 
-let curStage=2, curTab='classement', curScores={};
+function firstInitials(s){
+  const parts = s.trim().split(/\s+/);
+  return normStr(parts[0].replace(/\./g, ''));
+}
 
-function norm(s){return s.toLowerCase().replace(/[^a-z]/g,'');}
-function match(a,b){
-  if(norm(a)===norm(b))return true;
-  const ap=a.toLowerCase().split(/[\s\-\.]+/).filter(Boolean);
-  const bp=b.toLowerCase().split(/[\s\-\.]+/).filter(Boolean);
-  const aL=ap[ap.length-1],bL=bp[bp.length-1];
-  if(aL&&bL&&norm(aL)===norm(bL))return true;
-  if(ap.some(x=>x.length>3&&bp.some(y=>y.length>3&&norm(x)===norm(y))))return true;
+function sameRider(a,b){
+  if(!a||!b) return false;
+  const an=normStr(a), bn=normStr(b);
+  if(an===bn) return true;
+
+  // Table d'aliases (prioritaire)
+  const al=a.toLowerCase().trim(), bl=b.toLowerCase().trim();
+  for(const grp of ALIASES){
+    const gn=grp.map(normStr);
+    const inA=gn.some(v=>v===normStr(al));
+    const inB=gn.some(v=>v===normStr(bl));
+    if(inA&&inB) return true;
+  }
+
+  // Comparaison nom de famille + initiale du prénom
+  // Gère "J. Vingegaard" vs "Vingegaard Jonas"
+  const aLast=normStr(lastName(a));
+  const bLast=normStr(lastName(b));
+  if(aLast.length>2 && aLast===bLast){
+    const aInit=firstInitials(a);
+    const bInit=firstInitials(b);
+    if(aInit&&bInit&&(aInit.startsWith(bInit)||bInit.startsWith(aInit))) return true;
+    if(aLast.length>6) return true;
+  }
+
   return false;
 }
-function isDNF(name,sd){return(sd.dnf||[]).some(d=>match(d,name));}
-function getGC(name,gc){return gc.find(r=>match(r.name,name))||null;}
 
-// Retourne le gapSec par rapport à la 15e place (positif = derrière la 15e)
-function gapVs15(coureur,sd){
-  if(isDNF(coureur,sd)) return Infinity;
-  const entry=getGC(coureur,sd.gc);
-  if(!entry) return Infinity;
-  const r15=sd.gc.find(r=>r.pos===15);
-  if(!r15) return null;
-  return entry.gapSec - r15.gapSec;
-}
+function isDNF(name,dnfList){return dnfList.some(d=>sameRider(d,name));}
+function getGCEntry(name,gc){return gc.find(r=>sameRider(r.name,name))||null;}
 
-function rowClass(coureur,gcPos,sd){
-  if(isDNF(coureur,sd)) return 'row-dnf';
-  if(!gcPos){
-    const g=gapVs15(coureur,sd);
-    if(g===Infinity||g===null) return 'row-lost';
-    if(g<0) return 'row-top15'; // devant la 15e mais pos pas capturée
-    if(g<180) return 'row-near15';
-    if(g<900) return 'row-far15';
-    return 'row-lost';
+// ═══════════════════════════════════════════════════════════════
+// RÈGLE DU RÉSERVISTE
+// Réévaluation depuis le pronostic initial à chaque étape.
+// Parmi les abandons dans les 10, on supprime le MIEUX CLASSÉ
+// dans le pronostic initial. Le réserviste entre en 10e.
+// Les autres abandons restent dans la liste sans rapporter de pts.
+// ═══════════════════════════════════════════════════════════════
+function applyRules(pName, dnfList){
+  const prono = PRONOSTICS[pName];
+  let list = [...prono.top10];
+  let resActif = false;
+  let replacedName = null;
+
+  // Trouver tous les abandons parmi les 10 du pronostic initial
+  const dnfInList = list
+    .map((c,i) => ({c, i}))
+    .filter(({c}) => isDNF(c, dnfList));
+
+  if(dnfInList.length > 0){
+    // Choisir le mieux classé dans le pronostic initial (index le plus bas)
+    const best = dnfInList.reduce((a,b) => a.i < b.i ? a : b);
+    replacedName = best.c;
+    // Supprimer ce coureur, décaler les suivants, réserviste en 10e
+    list.splice(best.i, 1);
+    list.push(prono.res);
+    resActif = true;
   }
-  if(gcPos<=10) return 'row-top10';
-  if(gcPos<=15) return 'row-top15';
-  const g=gapVs15(coureur,sd);
-  if(g===Infinity||g===null) return 'row-lost';
-  if(g<180) return 'row-near15';
-  if(g<900) return 'row-far15';
-  return 'row-lost';
+
+  return {list, resActif, replacedName};
 }
 
-function getBuckets(rows,sd){
-  let top15=0,near=0,far=0,out=0;
-  rows.forEach(r=>{
-    if(isDNF(r.coureur,sd)){out++;return;}
-    const pos=r.gcPos;
-    if(pos&&pos<=15){top15++;return;}
-    const g=gapVs15(r.coureur,sd);
-    if(g===Infinity||g===null){out++;return;}
-    if(g<180) near++;
-    else if(g<900) far++;
-    else out++;
-  });
-  return{top15,near,far,out};
-}
+// ═══════════════════════════════════════════════════════════════
+// CALCUL DES SCORES
+// ═══════════════════════════════════════════════════════════════
+function computeScores(stageData){
+  const {gc, dnf} = stageData;
+  const out = {};
 
-function applyRules(pName,sd){
-  const prono=PRONOSTICS[pName];
-  const sameDay=(sd.dnfSameAsRes||{})[pName];
-  let list=[...prono.top10],resActif=false,resBloque=false,replacedName=null;
-  const idx=list.findIndex(c=>isDNF(c,sd));
-  if(idx!==-1){
-    replacedName=list[idx];
-    if(sameDay||isDNF(prono.res,sd)){resBloque=true;}
-    else{list.splice(idx,1);list.push(prono.res);resActif=true;}
-  }
-  return{list,resActif,resBloque,replacedName};
-}
+  for(const [name] of Object.entries(PRONOSTICS)){
+    const {list, resActif, replacedName} = applyRules(name, dnf);
+    let total = 0, rows = [];
 
-function computeScores(sd){
-  const out={};
-  for(const[name] of Object.entries(PRONOSTICS)){
-    const{list,resActif,resBloque,replacedName}=applyRules(name,sd);
-    let total=0,rows=[];
-    list.forEach((coureur,i)=>{
-      const dnf=isDNF(coureur,sd);
-      const entry=getGC(coureur,sd.gc);
-      const gcPos=(!dnf&&entry)?entry.pos:null;
-      const mult=MULTS[i];
-      const pts=(gcPos&&PTS_GC[gcPos])?PTS_GC[gcPos]:0;
-      const score=pts*mult;
-      total+=score;
-      rows.push({coureur,gcPos,mult,pts,score,dnf,isRes:resActif&&i===list.length-1});
+    list.forEach((coureur, i) => {
+      const isAbandoned = isDNF(coureur, dnf);
+      const entry = getGCEntry(coureur, gc);
+      const gcPos = (!isAbandoned && entry) ? entry.pos : null;
+      const mult  = MULTS[i];
+      const pts   = (gcPos && PTS_GC[gcPos]) ? PTS_GC[gcPos] : 0;
+      const score = pts * mult;
+      total += score;
+      rows.push({coureur, gcPos, mult, pts, score,
+                 dnf: isAbandoned,
+                 isRes: resActif && i === list.length - 1,
+                 gapSec: entry ? entry.gapSec : null});
     });
-    out[name]={total:Math.round(total*10)/10,rows,resActif,resBloque,replacedName};
+
+    out[name] = {
+      total: Math.round(total * 10) / 10,
+      rows, resActif, replacedName
+    };
   }
   return out;
 }
 
+// ═══════════════════════════════════════════════════════════════
+// CODE COULEUR
+// ═══════════════════════════════════════════════════════════════
+function gapVs15(gapSec, stageData){
+  const r15 = stageData.gc.find(r => r.pos === 15);
+  if(!r15) return null;
+  return gapSec - r15.gapSec;
+}
+
+function rowClass(row, stageData){
+  if(row.dnf) return 'row-dnf';
+  if(row.gcPos){
+    if(row.gcPos <= 10) return 'row-top10';
+    if(row.gcPos <= 15) return 'row-top15';
+  }
+  if(row.gapSec === null) return 'row-lost';
+  const g = gapVs15(row.gapSec, stageData);
+  if(g === null) return '';
+  if(g < 0)   return 'row-top15';
+  if(g < 180) return 'row-near15';
+  if(g < 900) return 'row-far15';
+  return 'row-lost';
+}
+
+function getBuckets(rows, stageData){
+  let top15=0, near=0, far=0, out=0;
+  rows.forEach(r => {
+    const cls = rowClass(r, stageData);
+    if(cls==='row-top10'||cls==='row-top15') top15++;
+    else if(cls==='row-near15') near++;
+    else if(cls==='row-far15')  far++;
+    else out++;
+  });
+  return {top15, near, far, out};
+}
+
+// ═══════════════════════════════════════════════════════════════
+// CHARGEMENT DEPUIS GOOGLE SHEETS
+// ═══════════════════════════════════════════════════════════════
+function setSync(state, msg){
+  const dot = document.getElementById('sdot');
+  const txt = document.getElementById('stxt');
+  dot.className = 'sync-dot' + (state==='loading'?' loading':state==='error'?' error':'');
+  txt.textContent = msg;
+}
+
+async function loadAllStages(){
+  setSync('loading', 'Chargement depuis Google Sheets…');
+  try{
+    const resp = await fetch(SHEETS_URL);
+    if(!resp.ok) throw new Error('HTTP ' + resp.status);
+    const data = await resp.json();
+
+    // data = { "1": {stage, gc, dnf}, "2": {...}, ... }
+    allData = {};
+    let maxStage = 0;
+    for(const [key, val] of Object.entries(data)){
+      const n = parseInt(key);
+      if(!isNaN(n) && val.gc && val.gc.length > 0){
+        allData[n] = val;
+        if(n > maxStage) maxStage = n;
+      }
+    }
+
+    lastAvail = maxStage;
+
+    // Mettre à jour le select : marquer les étapes disponibles
+    updateSelect();
+
+    if(maxStage > 0){
+      curStage = maxStage;
+      document.getElementById('sel').value = curStage;
+      setSync('ok', `Données à jour — ${maxStage} étape${maxStage>1?'s':''} disponible${maxStage>1?'s':''} · ${new Date().toLocaleTimeString('fr',{hour:'2-digit',minute:'2-digit'})}`);
+    } else {
+      setSync('ok', 'Aucune étape disponible dans le Sheet pour l\'instant');
+    }
+
+    renderAll();
+  } catch(e){
+    setSync('error', 'Erreur de connexion au Sheet (' + e.message + ')');
+    renderAll();
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RENDU
+// ═══════════════════════════════════════════════════════════════
+function updateSelect(){
+  const sel = document.getElementById('sel');
+  Array.from(sel.options).forEach(opt => {
+    const n = parseInt(opt.value);
+    const avail = !!allData[n];
+    opt.textContent = opt.textContent.replace(' (à venir)','').replace(' ✓','');
+    if(avail)  opt.textContent += ' ✓';
+    else       opt.textContent += ' (à venir)';
+  });
+}
+
 function renderStageHeader(n){
-  const s=STAGES[n-1];
-  document.getElementById('stage-hd').innerHTML=`
+  const s = STAGES[n-1];
+  document.getElementById('stage-hd').innerHTML = `
   <div class="stage-card">
     <div class="stage-num">Étape ${s.n}</div>
     <div class="stage-info">
@@ -370,149 +466,187 @@ function renderStageHeader(n){
 }
 
 function renderAll(){
-  const sd=HISTORY[curStage]||null;
+  const sd = allData[curStage] || null;
   renderStageHeader(curStage);
-  document.getElementById('btn-prev').disabled=curStage<=1;
-  document.getElementById('btn-next').disabled=curStage>=21;
+  document.getElementById('btn-prev').disabled = curStage <= 1;
+  document.getElementById('btn-next').disabled = curStage >= 21;
 
   if(!sd){
-    const s=STAGES[curStage-1];
-    document.getElementById('alerts').innerHTML='';
-    document.getElementById('cards').innerHTML=`<div class="no-data">Étape non encore disputée<br><span style="font-size:12px">${s.date} · ${s.dep} → ${s.arr}</span></div>`;
-    document.getElementById('gc-body').innerHTML=`<tr><td colspan="4" class="no-data">Résultats à venir</td></tr>`;
-    document.getElementById('prono-list').innerHTML=`<div class="no-data">Résultats à venir</div>`;
-    curScores={};return;
+    const s = STAGES[curStage-1];
+    document.getElementById('alerts').innerHTML = '';
+    document.getElementById('cards').innerHTML = `<div class="no-data">Étape non encore disponible<br><span style="font-size:12px">${s.date} · ${s.dep} → ${s.arr}</span></div>`;
+    document.getElementById('gc-body').innerHTML = `<tr><td colspan="4" class="no-data">Résultats à venir</td></tr>`;
+    document.getElementById('prono-list').innerHTML = `<div class="no-data">Résultats à venir</div>`;
+    curScores = {}; return;
   }
 
-  const scores=computeScores(sd);
-  curScores=scores;
-  const sorted=Object.entries(scores).sort((a,b)=>b[1].total-a[1].total);
+  const scores = computeScores(sd);
+  curScores = scores;
+  const sorted = Object.entries(scores).sort((a,b) => b[1].total - a[1].total);
 
-  // Alertes
-  const az=document.getElementById('alerts');
-  az.innerHTML='';
-  for(const[name,data] of Object.entries(scores)){
-    const prono=PRONOSTICS[name];
-    const firstDNF=prono.top10.find(c=>isDNF(c,sd));
-    if(firstDNF&&data.resBloque)
-      az.innerHTML+=`<div class="alert"><strong>${name}</strong> — ${firstDNF} a abandonné, mais le réserviste (${prono.res}) aussi le même jour → pas de substitution.</div>`;
-    else if(firstDNF&&data.resActif)
-      az.innerHTML+=`<div class="alert-info"><strong>${name}</strong> — Réserviste activé : ${prono.res} remplace ${firstDNF} (DNF).</div>`;
+  // Alertes réserviste
+  const az = document.getElementById('alerts');
+  az.innerHTML = '';
+  for(const [name, data] of Object.entries(scores)){
+    const prono = PRONOSTICS[name];
+    if(data.replacedName && data.resActif){
+      az.innerHTML += `<div class="alert-info"><strong>${name}</strong> — Réserviste activé : ${prono.res} remplace ${data.replacedName} (meilleur classé parmi les abandons).</div>`;
+    }
   }
 
-  // Cartes avec buckets (2)
-  const cards=document.getElementById('cards');
-  cards.innerHTML='';
-  sorted.forEach(([name,data],idx)=>{
-    const rc=idx===0?'r1':idx===1?'r2':idx===2?'r3':'rN';
-    const b=getBuckets(data.rows,sd);
-    cards.innerHTML+=`
+  // Cartes classement
+  const cards = document.getElementById('cards');
+  cards.innerHTML = '';
+  sorted.forEach(([name, data], idx) => {
+    const rc = idx===0?'r1':idx===1?'r2':idx===2?'r3':'rN';
+    const b  = getBuckets(data.rows, sd);
+    cards.innerHTML += `
     <div class="pcard${idx===0?' gold':''}" onclick="showDetail('${name}')">
       <div class="pc-head"><span class="pc-name">${name}</span><span class="rb ${rc}">${idx+1}</span></div>
       <div class="pc-pts">${data.total.toFixed(1)}</div>
       <div class="pc-sub">points · cliquer pour détail</div>
       <div class="pc-buckets">
-        <div class="bucket b-green" title="Dans le top 15"><div class="bucket-val">${b.top15}</div><div class="bucket-lbl">Dans le top 15</div></div>
-        <div class="bucket b-lime"  title="À moins de 3 min du top 15"><div class="bucket-val">${b.near}</div><div class="bucket-lbl">À &lt;3 min du top 15</div></div>
-        <div class="bucket b-orange"title="À 3–15 min du top 15"><div class="bucket-val">${b.far}</div><div class="bucket-lbl">Distancés (3–15 min)</div></div>
-        <div class="bucket b-red"   title="Hors top 15 ou hors course"><div class="bucket-val">${b.out}</div><div class="bucket-lbl">Abandons / &gt;15 min</div></div>
+        <div class="bucket b-green" ><div class="bucket-val">${b.top15}</div><div class="bucket-lbl">Dans le top 15</div></div>
+        <div class="bucket b-lime"  ><div class="bucket-val">${b.near}</div><div class="bucket-lbl">À &lt;3 min du top 15</div></div>
+        <div class="bucket b-orange"><div class="bucket-val">${b.far}</div><div class="bucket-lbl">Distancés (3–15 min)</div></div>
+        <div class="bucket b-red"   ><div class="bucket-val">${b.out}</div><div class="bucket-lbl">Abandons / &gt;15 min</div></div>
       </div>
     </div>`;
   });
 
-  // Classement général top 30 (3)
-  const gcBody=document.getElementById('gc-body');
-  gcBody.innerHTML='';
-  const gcClassement=sd.gc.filter(r=>!isDNF(r.name,sd)).slice(0,30);
-  const gcDNF=sd.gc.filter(r=>isDNF(r.name,sd));
-  [...gcClassement,...gcDNF].forEach(r=>{
-    const dnf=isDNF(r.name,sd);
-    const bc=r.pos===1?'p1':r.pos===2?'p2':r.pos===3?'p3':'pN';
-    const proTag=Object.values(PRONOSTICS).some(p=>[...p.top10,p.res].some(c=>match(r.name,c)))?'<span class="ptag">pronostiqué</span>':'';
-    const dnfTag=dnf?'<span class="dnftag">DNF</span>':'';
-    const style=dnf?'style="opacity:.5"':'';
-    gcBody.innerHTML+=`<tr ${style}><td><span class="pb ${bc}">${dnf?'—':r.pos}</span></td><td>${r.name}${proTag}${dnfTag}</td><td style="color:#666;font-size:12px">${r.team}</td><td style="font-family:monospace;font-size:12px;color:#666">${dnf?'—':r.time}</td></tr>`;
+  // Classement général top 30
+  const gcBody = document.getElementById('gc-body');
+  gcBody.innerHTML = '';
+  const allTracked = new Set(
+    Object.values(PRONOSTICS).flatMap(p => [...p.top10, p.res])
+  );
+  sd.gc.slice(0, 30).forEach(r => {
+    const bc = r.pos===1?'p1':r.pos===2?'p2':r.pos===3?'p3':'pN';
+    const proTag = [...allTracked].some(c => sameRider(r.name, c))
+      ? '<span class="ptag">pronostiqué</span>' : '';
+    gcBody.innerHTML += `<tr><td><span class="pb ${bc}">${r.pos}</span></td><td>${r.name}${proTag}</td><td style="color:#666;font-size:12px">${r.team}</td><td style="font-family:monospace;font-size:12px;color:#666">${r.time}</td></tr>`;
   });
 
   renderPronoList();
 }
 
 function renderPronoList(){
-  const pl=document.getElementById('prono-list');
-  pl.innerHTML='';
-  if(!Object.keys(curScores).length){pl.innerHTML='<div class="no-data">Résultats à venir</div>';return;}
-  Object.keys(PRONOSTICS).forEach(name=>{
-    const d=curScores[name];
-    const tag=d.resActif?'<span class="rtag">réserviste actif</span>':d.resBloque?'<span style="font-size:11px;color:#854d0e;margin-left:6px">⚠ rés. bloqué</span>':'';
-    pl.innerHTML+=`<div class="pcard" onclick="showDetailFromProno('${name}')"><div class="pc-head"><span class="pc-name">${name}${tag}</span>›</div><div style="font-size:13px;color:#666">${d.total.toFixed(1)} pts</div></div>`;
+  const pl = document.getElementById('prono-list');
+  pl.innerHTML = '';
+  if(!Object.keys(curScores).length){
+    pl.innerHTML = '<div class="no-data">Résultats à venir</div>'; return;
+  }
+  Object.keys(PRONOSTICS).forEach(name => {
+    const d = curScores[name];
+    const tag = d.resActif
+      ? '<span class="rtag">réserviste actif</span>' : '';
+    pl.innerHTML += `<div class="pcard" onclick="showDetailFromProno('${name}')">
+      <div class="pc-head"><span class="pc-name">${name}${tag}</span>›</div>
+      <div style="font-size:13px;color:#666">${d.total.toFixed(1)} pts</div>
+    </div>`;
   });
-  document.getElementById('prono-list').style.display='';
+  document.getElementById('prono-list').style.display = '';
   document.getElementById('prono-detail').classList.remove('active');
 }
 
 function showDetail(name){
-  const data=curScores[name];if(!data)return;
-  const prono=PRONOSTICS[name];
-  const sd=HISTORY[curStage];
-  document.getElementById('dname').textContent=name+' — Étape '+curStage;
-  const tb=document.getElementById('dbody');
-  tb.innerHTML='';
-  let tot=0;
-  data.rows.forEach((r,i)=>{
-    const gcStr=r.dnf?'<em style="color:#b91c1c;font-size:11px">DNF</em>':(r.gcPos?`${r.gcPos}e`:'<span style="color:#999">—</span>');
-    tot+=r.score;
-    const resTag=r.isRes?'<span class="rtag">réserviste</span>':'';
-    const cls=rowClass(r.coureur,r.gcPos,sd);
-    tb.innerHTML+=`<tr class="${cls}"><td>${i+1}<span class="mult">×${r.mult}</span></td><td>${r.coureur}${resTag}</td><td>${gcStr}</td><td>${r.score>0?r.score.toFixed(1):'0'}</td></tr>`;
+  const data = curScores[name]; if(!data) return;
+  const prono = PRONOSTICS[name];
+  const sd    = allData[curStage];
+  document.getElementById('dname').textContent = name + ' — Étape ' + curStage;
+  const tb = document.getElementById('dbody');
+  tb.innerHTML = '';
+  let tot = 0;
+
+  data.rows.forEach((r, i) => {
+    const gcStr = r.dnf
+      ? '<em style="color:#b91c1c;font-size:11px">DNF</em>'
+      : (r.gcPos ? `${r.gcPos}e` : '<span style="color:#999">—</span>');
+    tot += r.score;
+    const resTag = r.isRes ? '<span class="rtag">réserviste</span>' : '';
+    const cls = rowClass(r, sd);
+    tb.innerHTML += `<tr class="${cls}">
+      <td>${i+1}<span class="mult">×${r.mult}</span></td>
+      <td>${r.coureur}${resTag}</td>
+      <td>${gcStr}</td>
+      <td>${r.score > 0 ? r.score.toFixed(1) : '0'}</td>
+    </tr>`;
   });
 
-  // Ligne total
-  tb.innerHTML+=`<tr class="tot-row"><td colspan="3">Total</td><td>${(Math.round(tot*10)/10).toFixed(1)}</td></tr>`;
+  tb.innerHTML += `<tr class="tot-row"><td colspan="3">Total</td><td>${(Math.round(tot*10)/10).toFixed(1)}</td></tr>`;
 
-  // Ligne réserviste (toujours affichée)
-  const resEntry=sd?getGC(prono.res,sd.gc):null;
-  const resPos=sd&&isDNF(prono.res,sd)?'DNF':(resEntry?`${resEntry.pos}e au GC`:'—');
-  const resNote=data.resActif?' (actif)':data.resBloque?' (bloqué)':'';
-  tb.innerHTML+=`<tr style="opacity:.75"><td style="color:#666">Rés.</td><td>${prono.res}<span style="color:#e8052b;font-size:11px;margin-left:4px">${resNote}</span></td><td style="color:#666;font-size:12px">${resPos}</td><td style="color:#999;text-align:right">—</td></tr>`;
-
-  // 1.1 : ligne coureur remplacé si réserviste actif
-  if(data.resActif && data.replacedName){
-    tb.innerHTML+=`<tr class="replaced-row"><td colspan="4" style="padding:7px 12px">↳ Remplace ${data.replacedName} (abandonné / hors course)</td></tr>`;
+  // Ligne réserviste avec code couleur
+  if(sd){
+    const resEntry = getGCEntry(prono.res, sd.gc);
+    const resIsDNF = isDNF(prono.res, sd.dnf);
+    const resPos   = resIsDNF ? 'DNF' : (resEntry ? `${resEntry.pos}e au GC` : 'Non classé');
+    const resNote  = data.resActif ? ' (actif)' : '';
+    const resRow   = {
+      coureur: prono.res,
+      gcPos: resEntry && !resIsDNF ? resEntry.pos : null,
+      gapSec: resEntry ? resEntry.gapSec : null,
+      dnf: resIsDNF
+    };
+    const resCls = rowClass(resRow, sd);
+    tb.innerHTML += `<tr class="${resCls}" style="opacity:.85">
+      <td style="color:#555">Rés.</td>
+      <td>${prono.res}<span style="color:#e8052b;font-size:11px;margin-left:4px">${resNote}</span></td>
+      <td style="color:#555;font-size:12px">${resPos}</td>
+      <td style="color:#999">—</td>
+    </tr>`;
   }
 
-  if(curTab==='pronostics'){
-    document.getElementById('prono-list').style.display='none';
+  // Coureur remplacé
+  if(data.resActif && data.replacedName){
+    tb.innerHTML += `<tr class="replaced-row">
+      <td colspan="4" style="padding:7px 12px">↳ Remplace ${data.replacedName} (abandonné)</td>
+    </tr>`;
+  }
+
+  if(curTab === 'pronostics'){
+    document.getElementById('prono-list').style.display = 'none';
     document.getElementById('prono-detail').classList.add('active');
   } else {
-    showTab('pronostics',document.querySelectorAll('.tab')[2]);
-    document.getElementById('prono-list').style.display='none';
+    showTab('pronostics', document.querySelectorAll('.tab')[2]);
+    document.getElementById('prono-list').style.display = 'none';
     document.getElementById('prono-detail').classList.add('active');
   }
 }
 
-function showDetailFromProno(name){showDetail(name);}
-function backList(){document.getElementById('prono-list').style.display='';document.getElementById('prono-detail').classList.remove('active');}
-
-function showTab(tab,btn){
-  curTab=tab;
-  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
-  document.getElementById('tab-'+tab).classList.add('active');
-  if(btn)btn.classList.add('active');
-  if(tab==='pronostics')renderPronoList();
+function showDetailFromProno(name){ showDetail(name); }
+function backList(){
+  document.getElementById('prono-list').style.display = '';
+  document.getElementById('prono-detail').classList.remove('active');
 }
-function changeStage(n){curStage=n;renderAll();}
-function navigate(dir){const n=curStage+dir;if(n<1||n>21)return;curStage=n;document.getElementById('sel').value=n;renderAll();}
+function showTab(tab, btn){
+  curTab = tab;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  if(btn) btn.classList.add('active');
+  if(tab === 'pronostics') renderPronoList();
+}
+function changeStage(n){ curStage = n; renderAll(); }
+function navigate(dir){
+  const n = curStage + dir;
+  if(n < 1 || n > 21) return;
+  curStage = n;
+  document.getElementById('sel').value = n;
+  renderAll();
+}
 
-const sel=document.getElementById('sel');
-STAGES.forEach(s=>{
-  const o=document.createElement('option');
-  o.value=s.n;
-  o.textContent=`Étape ${s.n} — ${s.dep} › ${s.arr}${!HISTORY[s.n]?' (à venir)':''}`;
-  if(s.n===curStage)o.selected=true;
+// ── Init select ──────────────────────────────────────────────────
+const sel = document.getElementById('sel');
+STAGES.forEach(s => {
+  const o = document.createElement('option');
+  o.value = s.n;
+  o.textContent = `Étape ${s.n} — ${s.dep} › ${s.arr} (à venir)`;
+  if(s.n === curStage) o.selected = true;
   sel.appendChild(o);
 });
-renderAll();
+
+// Lancement
+loadAllStages();
 </script>
 </body>
 </html>
