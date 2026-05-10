@@ -2,7 +2,6 @@
 <html lang="fr">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Giro d'Italia 2026 — Pronostics</title>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:system-ui,sans-serif;background:#f8f8f6;color:#1a1a1a;padding:1rem}
@@ -43,11 +42,15 @@ body{font-family:system-ui,sans-serif;background:#f8f8f6;color:#1a1a1a;padding:1
 .rb{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:500}
 .r1{background:#fef9c3;color:#854d0e}.r2{background:#f1f5f9;color:#334155}.r3{background:#fff7ed;color:#92400e}.rN{background:#f0f0f0;color:#666}
 .pc-pts{font-size:26px;font-weight:500}
-.pc-sub{font-size:12px;color:#666}
-.pc-rows{margin-top:10px;border-top:1px solid #f0f0f0;padding-top:8px;display:flex;flex-direction:column;gap:3px}
-.pc-row{display:flex;justify-content:space-between;font-size:12px}
-.cn{color:#666}.cn.dnf{text-decoration:line-through;opacity:.45}
-.cp{font-weight:500}
+.pc-sub{font-size:12px;color:#666;margin-bottom:10px}
+.pc-buckets{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding-top:10px;border-top:1px solid #f0f0f0}
+.bucket{border-radius:8px;padding:7px 10px}
+.bucket-val{font-size:20px;font-weight:700;line-height:1}
+.bucket-lbl{font-size:10px;line-height:1.4;margin-top:2px}
+.b-green {background:#dcfce7;color:#166534}
+.b-lime  {background:#f0fdf4;color:#15803d;border:1px solid #bbf7d0}
+.b-orange{background:#ffedd5;color:#9a3412}
+.b-red   {background:#fee2e2;color:#991b1b}
 .tbl-wrap{background:#fff;border:1px solid #e5e5e5;border-radius:12px;overflow:hidden;margin-bottom:1rem}
 .tbl{width:100%;border-collapse:collapse}
 .tbl thead tr{background:#f8f8f6}
@@ -62,16 +65,27 @@ body{font-family:system-ui,sans-serif;background:#f8f8f6;color:#1a1a1a;padding:1
 .back-btn:hover{color:#1a1a1a}
 .detail-title{font-size:18px;font-weight:500;color:#1a1a1a}
 .dtbl th{font-size:12px;font-weight:500;color:#666;padding:8px 12px;background:#f8f8f6;text-align:left}
-.dtbl td{font-size:13px;padding:9px 12px;border-top:1px solid #f0f0f0}
+.dtbl td{font-size:13px;padding:9px 12px;border-top:1px solid #f0f0f0;color:#1a1a1a}
 .dtbl td:last-child{text-align:right;font-weight:500}
-.tot td{font-weight:500;font-size:14px;background:#f8f8f6}
-.dnf-row td{opacity:.45}
+.tot-row td{font-weight:600;font-size:14px;background:#f8f8f6 !important}
 .mult{font-size:11px;color:#999;margin-left:4px}
 .rtag{font-size:11px;padding:1px 6px;border-radius:10px;background:#fde8ec;color:#9b1c1c;margin-left:5px}
+/* Couleurs lignes tableau détail */
+.row-top10  td{background:#dcfce7}
+.row-top15  td{background:#f0fdf4}
+.row-near15 td{background:#fef9c3}
+.row-far15  td{background:#ffedd5}
+.row-lost   td{background:#fee2e2}
+.row-dnf    td{background:#f3f4f6;color:#888}
+.replaced-row td{background:#f3f4f6;color:#888;font-style:italic;font-size:12px}
+/* Légende */
+.legend{display:flex;flex-wrap:wrap;gap:8px;margin-top:1rem;font-size:11px;color:#555;padding:10px 12px;background:#fff;border:1px solid #e5e5e5;border-radius:8px}
+.legend-item{display:flex;align-items:center;gap:5px}
+.legend-dot{width:12px;height:12px;border-radius:3px;flex-shrink:0}
 .no-data{text-align:center;padding:2rem;color:#666;font-size:14px;grid-column:1/-1}
 .detail-view{display:none}.detail-view.active{display:block}
-.alert{background:#fef3c7;border:1px solid #fde68a;border-radius:8px;padding:10px 14px;font-size:13px;color:#92400e;margin-bottom:.75rem;display:flex;gap:8px;align-items:flex-start}
-.alert-info{background:#f8f8f6;border-radius:8px;padding:10px 14px;font-size:13px;color:#666;margin-bottom:.75rem;display:flex;gap:8px}
+.alert{background:#fef3c7;border:1px solid #fde68a;border-radius:8px;padding:10px 14px;font-size:13px;color:#92400e;margin-bottom:.75rem}
+.alert-info{background:#f8f8f6;border-radius:8px;padding:10px 14px;font-size:13px;color:#666;margin-bottom:.75rem}
 </style>
 </head>
 <body>
@@ -97,13 +111,40 @@ body{font-family:system-ui,sans-serif;background:#f8f8f6;color:#1a1a1a;padding:1
   <button class="tab" onclick="showTab('gc',this)">Classement général</button>
   <button class="tab" onclick="showTab('pronostics',this)">Pronostics</button>
 </div>
-<div id="tab-classement" class="section active"><div id="alerts"></div><div class="grid2" id="cards"></div></div>
-<div id="tab-gc" class="section"><div class="tbl-wrap"><table class="tbl"><thead><tr><th>Pos.</th><th>Coureur</th><th>Équipe</th><th>Écart</th></tr></thead><tbody id="gc-body"></tbody></table></div></div>
+
+<div id="tab-classement" class="section active">
+  <div id="alerts"></div>
+  <div class="grid2" id="cards"></div>
+</div>
+
+<div id="tab-gc" class="section">
+  <div class="tbl-wrap">
+    <table class="tbl">
+      <thead><tr><th>Pos.</th><th>Coureur</th><th>Équipe</th><th>Écart</th></tr></thead>
+      <tbody id="gc-body"></tbody>
+    </table>
+  </div>
+</div>
+
 <div id="tab-pronostics" class="section">
   <div class="grid2" id="prono-list"></div>
   <div class="detail-view" id="prono-detail">
     <div class="back-btn" onclick="backList()">&#8592; <span class="detail-title" id="dname"></span></div>
-    <div class="tbl-wrap"><table class="tbl dtbl"><thead><tr><th>Rang parié</th><th>Coureur</th><th>Pos. GC</th><th>Points</th></tr></thead><tbody id="dbody"></tbody></table></div>
+    <div class="tbl-wrap">
+      <table class="tbl dtbl">
+        <thead><tr><th>Rang parié</th><th>Coureur</th><th>Pos. GC</th><th>Points</th></tr></thead>
+        <tbody id="dbody"></tbody>
+      </table>
+    </div>
+    <div class="legend">
+      <strong style="width:100%;margin-bottom:2px">Code couleur :</strong>
+      <div class="legend-item"><div class="legend-dot" style="background:#dcfce7"></div> Top 10</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#f0fdf4;border:1px solid #bbf7d0"></div> 11e–15e place</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#fef9c3"></div> À moins de 3 min de la 15e place</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#ffedd5"></div> À 3–15 min de la 15e place</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#fee2e2"></div> À plus de 15 min de la 15e place</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#f3f4f6;border:1px solid #ddd"></div> Hors course (DNF/DNS)</div>
+    </div>
   </div>
 </div>
 </div>
@@ -111,6 +152,7 @@ body{font-family:system-ui,sans-serif;background:#f8f8f6;color:#1a1a1a;padding:1
 <script>
 const MULTS=[10,9,8,6,5.5,5,4.5,4,3.5,3];
 const PTS_GC={1:15,2:13,3:11,4:9,5:8,6:7,7:6,8:5,9:4,10:3,11:2,12:2,13:1.5,14:1.5,15:1.5};
+
 const PRONOSTICS={
   Franziska:{top10:['J. Vingegaard','A. Yates','G. Pellizzari','E. Bernal','F. Gall','E. Mas','B. O\'Connor','J.A. Cepeda','G. Ciccone','M. Storer'],res:'S. Kuss'},
   Gérard:   {top10:['J. Vingegaard','A. Yates','G. Pellizzari','F. Gall','B. O\'Connor','M. Storer','T. Arensman','S. Buitrago','J. Vine','J. Hindley'],res:'E. Bernal'},
@@ -120,7 +162,6 @@ const PRONOSTICS={
   Zoé:      {top10:['J. Vingegaard','G. Pellizzari','J. Hindley','D. Gee-West','A. Pinarello','A. Yates','T. Arensman','F. Gall','B. O\'Connor','E. Bernal'],res:'J. Vine'}
 };
 
-// Classification Wikipedia exacte
 const STAGES=[
   {n:1, date:'08.05.2026',dep:'Nessebar',           arr:'Burgas',           km:147,  type:'t-plat',label:'Plat'},
   {n:2, date:'09.05.2026',dep:'Burgas',              arr:'Veliko Tarnovo',   km:221,  type:'t-acc', label:'Accidentée'},
@@ -145,67 +186,82 @@ const STAGES=[
   {n:21,date:'31.05.2026',dep:'Rome',                arr:'Rome',             km:131,  type:'t-plat',label:'Plat'},
 ];
 
+// GC avec gapSec = écart en secondes par rapport au leader
 const GC1=[
-  {pos:1,name:'P. Magnier',     team:'Soudal QS',    time:'en tête'},
-  {pos:2,name:'T.L. Andresen',  team:'Soudal QS',    time:'+0:00'},
-  {pos:3,name:'J. Milan',       team:'Lidl-Trek',    time:'+0:00'},
-  {pos:4,name:'G. Thomas Silva',team:'XDS Astana',   time:'+0:00'},
-  {pos:5,name:'E. Vernon',      team:'NSN',          time:'+0:00'},
-  {pos:6,name:'J. Kulset',      team:'Uno-X',        time:'+0:00'},
-  {pos:7,name:'M. Tjøtta',      team:'Uno-X',        time:'+0:00'},
-  {pos:8,name:'L. Van Eetvelt', team:'Lotto',        time:'+0:00'},
-  {pos:9,name:'D. Rafferty',    team:'EF',           time:'+0:00'},
-  {pos:10,name:'J. Christen',   team:'UAE',          time:'+0:00'},
-  {pos:11,name:'J. Hirt',       team:'Astana',       time:'+0:00'},
-  {pos:12,name:'J. Hindley',    team:'Red Bull-Bora',time:'+0:00'},
-  {pos:13,name:'C. Scaroni',    team:'XDS Astana',   time:'+0:00'},
-  {pos:14,name:'D. Caruso',     team:'Bahrain',      time:'+0:00'},
-  {pos:15,name:'E. Mas',        team:'Cofidis',      time:'+0:00'},
-  {pos:16,name:'J. Vingegaard', team:'Visma',        time:'+0:00'},
-  {pos:17,name:'B. O\'Connor',  team:'Jayco',        time:'+0:00'},
-  {pos:18,name:'J.P. López',    team:'Movistar',     time:'+0:00'},
-  {pos:19,name:'J. Romo',       team:'Astana',       time:'+0:00'},
-  {pos:20,name:'E. Rubio',      team:'Movistar',     time:'+0:00'},
-  {pos:26,name:'M. Storer',     team:'Tudor',        time:'+0:00'},
-  {pos:27,name:'F. Gall',       team:'Decathlon',    time:'+0:00'},
-  {pos:30,name:'G. Pellizzari', team:'Red Bull-Bora',time:'+0:00'},
-  {pos:41,name:'A. Yates',      team:'UAE',          time:'+0:00'},
-  {pos:45,name:'D. Gee-West',   team:'UAE',          time:'+0:00'},
+  {pos:1, name:'P. Magnier',      team:'Soudal QS',    time:'en tête',gapSec:0},
+  {pos:2, name:'T.L. Andresen',   team:'Soudal QS',    time:'+0:00',  gapSec:0},
+  {pos:3, name:'J. Milan',        team:'Lidl-Trek',    time:'+0:00',  gapSec:0},
+  {pos:4, name:'G. Thomas Silva', team:'XDS Astana',   time:'+0:00',  gapSec:0},
+  {pos:5, name:'E. Vernon',       team:'NSN',          time:'+0:00',  gapSec:0},
+  {pos:6, name:'J. Kulset',       team:'Uno-X',        time:'+0:00',  gapSec:0},
+  {pos:7, name:'M. Tjøtta',       team:'Uno-X',        time:'+0:00',  gapSec:0},
+  {pos:8, name:'L. Van Eetvelt',  team:'Lotto',        time:'+0:00',  gapSec:0},
+  {pos:9, name:'D. Rafferty',     team:'EF',           time:'+0:00',  gapSec:0},
+  {pos:10,name:'J. Christen',     team:'UAE',          time:'+0:00',  gapSec:0},
+  {pos:11,name:'J. Hirt',         team:'Astana',       time:'+0:00',  gapSec:0},
+  {pos:12,name:'J. Hindley',      team:'Red Bull-Bora',time:'+0:00',  gapSec:0},
+  {pos:13,name:'C. Scaroni',      team:'XDS Astana',   time:'+0:00',  gapSec:0},
+  {pos:14,name:'D. Caruso',       team:'Bahrain',      time:'+0:00',  gapSec:0},
+  {pos:15,name:'E. Mas',          team:'Cofidis',      time:'+0:00',  gapSec:0},
+  {pos:16,name:'J. Vingegaard',   team:'Visma',        time:'+0:00',  gapSec:0},
+  {pos:17,name:'B. O\'Connor',    team:'Jayco',        time:'+0:00',  gapSec:0},
+  {pos:18,name:'J.P. López',      team:'Movistar',     time:'+0:00',  gapSec:0},
+  {pos:19,name:'J. Romo',         team:'Astana',       time:'+0:00',  gapSec:0},
+  {pos:20,name:'E. Rubio',        team:'Movistar',     time:'+0:00',  gapSec:0},
+  {pos:21,name:'G. Ciccone',      team:'Lidl-Trek',    time:'+0:00',  gapSec:0},
+  {pos:22,name:'T. Arensman',     team:'Ineos',        time:'+0:00',  gapSec:0},
+  {pos:23,name:'E. Bernal',       team:'Ineos',        time:'+0:00',  gapSec:0},
+  {pos:24,name:'M. Storer',       team:'Tudor',        time:'+0:00',  gapSec:0},
+  {pos:25,name:'F. Gall',         team:'Decathlon',    time:'+0:00',  gapSec:0},
+  {pos:26,name:'G. Pellizzari',   team:'Red Bull-Bora',time:'+0:00',  gapSec:0},
+  {pos:27,name:'A. Yates',        team:'UAE',          time:'+0:00',  gapSec:0},
+  {pos:28,name:'D. Gee-West',     team:'UAE',          time:'+0:00',  gapSec:0},
+  {pos:29,name:'J.A. Cepeda',     team:'Movistar',     time:'+0:00',  gapSec:0},
+  {pos:30,name:'S. Buitrago',     team:'Bahrain',      time:'+0:00',  gapSec:0},
 ];
+
+// Étape 2 : 15e place = E. Mas à +10s du leader
 const GC2=[
-  {pos:1,name:'G. Thomas Silva',team:'XDS Astana',   time:'en tête'},
-  {pos:2,name:'F. Stork',       team:'Tudor',        time:'+0:04'},
-  {pos:3,name:'E. Bernal',      team:'Ineos',        time:'+0:04'},
-  {pos:4,name:'T. Arensman',    team:'Ineos',        time:'+0:06'},
-  {pos:5,name:'G. Ciccone',     team:'Lidl-Trek',    time:'+0:06'},
-  {pos:6,name:'J. Christen',    team:'UAE',          time:'+0:10'},
-  {pos:7,name:'J. Kulset',      team:'Uno-X',        time:'+0:10'},
-  {pos:8,name:'L. Van Eetvelt', team:'Lotto',        time:'+0:10'},
-  {pos:9,name:'M. Tjøtta',      team:'Uno-X',        time:'+0:10'},
-  {pos:10,name:'D. Rafferty',   team:'EF',           time:'+0:10'},
-  {pos:11,name:'J. Hirt',       team:'Astana',       time:'+0:10'},
-  {pos:12,name:'J. Hindley',    team:'Red Bull-Bora',time:'+0:10'},
-  {pos:13,name:'C. Scaroni',    team:'XDS Astana',   time:'+0:10'},
-  {pos:14,name:'D. Caruso',     team:'Bahrain',      time:'+0:10'},
-  {pos:15,name:'E. Mas',        team:'Cofidis',      time:'+0:10'},
-  {pos:16,name:'J. Vingegaard', team:'Visma',        time:'+0:10'},
-  {pos:17,name:'B. O\'Connor',  team:'Jayco',        time:'+0:10'},
-  {pos:18,name:'J.P. López',    team:'Movistar',     time:'+0:10'},
-  {pos:19,name:'J. Romo',       team:'Astana',       time:'+0:10'},
-  {pos:20,name:'E. Rubio',      team:'Movistar',     time:'+0:10'},
-  {pos:26,name:'M. Storer',     team:'Tudor',        time:'+0:10'},
-  {pos:27,name:'F. Gall',       team:'Decathlon',    time:'+0:10'},
-  {pos:30,name:'G. Pellizzari', team:'Red Bull-Bora',time:'+0:10'},
-  {pos:41,name:'D. Gee-West',   team:'UAE',          time:'+1:11'},
-  {pos:99,name:'A. Yates',      team:'UAE',          time:'+13:46'},
+  {pos:1, name:'G. Thomas Silva', team:'XDS Astana',   time:'en tête', gapSec:0},
+  {pos:2, name:'F. Stork',        team:'Tudor',        time:'+0:04',   gapSec:4},
+  {pos:3, name:'E. Bernal',       team:'Ineos',        time:'+0:04',   gapSec:4},
+  {pos:4, name:'T. Arensman',     team:'Ineos',        time:'+0:06',   gapSec:6},
+  {pos:5, name:'G. Ciccone',      team:'Lidl-Trek',    time:'+0:06',   gapSec:6},
+  {pos:6, name:'J. Christen',     team:'UAE',          time:'+0:10',   gapSec:10},
+  {pos:7, name:'J. Kulset',       team:'Uno-X',        time:'+0:10',   gapSec:10},
+  {pos:8, name:'L. Van Eetvelt',  team:'Lotto',        time:'+0:10',   gapSec:10},
+  {pos:9, name:'M. Tjøtta',       team:'Uno-X',        time:'+0:10',   gapSec:10},
+  {pos:10,name:'D. Rafferty',     team:'EF',           time:'+0:10',   gapSec:10},
+  {pos:11,name:'J. Hirt',         team:'Astana',       time:'+0:10',   gapSec:10},
+  {pos:12,name:'J. Hindley',      team:'Red Bull-Bora',time:'+0:10',   gapSec:10},
+  {pos:13,name:'C. Scaroni',      team:'XDS Astana',   time:'+0:10',   gapSec:10},
+  {pos:14,name:'D. Caruso',       team:'Bahrain',      time:'+0:10',   gapSec:10},
+  {pos:15,name:'E. Mas',          team:'Cofidis',      time:'+0:10',   gapSec:10},
+  {pos:16,name:'J. Vingegaard',   team:'Visma',        time:'+0:10',   gapSec:10},
+  {pos:17,name:'B. O\'Connor',    team:'Jayco',        time:'+0:10',   gapSec:10},
+  {pos:18,name:'J.P. López',      team:'Movistar',     time:'+0:10',   gapSec:10},
+  {pos:19,name:'J. Romo',         team:'Astana',       time:'+0:10',   gapSec:10},
+  {pos:20,name:'E. Rubio',        team:'Movistar',     time:'+0:10',   gapSec:10},
+  {pos:21,name:'M. Storer',       team:'Tudor',        time:'+0:10',   gapSec:10},
+  {pos:22,name:'F. Gall',         team:'Decathlon',    time:'+0:10',   gapSec:10},
+  {pos:23,name:'G. Pellizzari',   team:'Red Bull-Bora',time:'+0:10',   gapSec:10},
+  {pos:24,name:'T. Arensman',     team:'Ineos',        time:'+0:10',   gapSec:10},
+  {pos:25,name:'G. Ciccone',      team:'Lidl-Trek',    time:'+0:10',   gapSec:10},
+  {pos:26,name:'J.A. Cepeda',     team:'Movistar',     time:'+0:10',   gapSec:10},
+  {pos:27,name:'S. Buitrago',     team:'Bahrain',      time:'+0:10',   gapSec:10},
+  {pos:28,name:'E. Bernal',       team:'Ineos',        time:'+0:10',   gapSec:10},
+  {pos:29,name:'J.P. López',      team:'Movistar',     time:'+0:10',   gapSec:10},
+  {pos:30,name:'E. Rubio',        team:'Movistar',     time:'+0:10',   gapSec:10},
+  {pos:41,name:'D. Gee-West',     team:'UAE',          time:'+1:11',   gapSec:71},
+  {pos:99,name:'A. Yates',        team:'UAE',          time:'+13:46',  gapSec:826},
 ];
 
 const HISTORY={
-  1:{gc:GC1,dnf:['Matteo Moschetti'],dnfSameAsRes:{}},
-  2:{gc:GC2,dnf:['J. Vine','M. Soler','Å. Holter'],dnfSameAsRes:{'Zoé':true}}
+  1:{gc:GC1, dnf:['Matteo Moschetti'], dnfSameAsRes:{}},
+  2:{gc:GC2, dnf:['J. Vine','M. Soler','Å. Holter'], dnfSameAsRes:{'Zoé':true}}
 };
 
-let curStage=2,curTab='classement',curScores={};
+let curStage=2, curTab='classement', curScores={};
 
 function norm(s){return s.toLowerCase().replace(/[^a-z]/g,'');}
 function match(a,b){
@@ -220,22 +276,67 @@ function match(a,b){
 function isDNF(name,sd){return(sd.dnf||[]).some(d=>match(d,name));}
 function getGC(name,gc){return gc.find(r=>match(r.name,name))||null;}
 
+// Retourne le gapSec par rapport à la 15e place (positif = derrière la 15e)
+function gapVs15(coureur,sd){
+  if(isDNF(coureur,sd)) return Infinity;
+  const entry=getGC(coureur,sd.gc);
+  if(!entry) return Infinity;
+  const r15=sd.gc.find(r=>r.pos===15);
+  if(!r15) return null;
+  return entry.gapSec - r15.gapSec;
+}
+
+function rowClass(coureur,gcPos,sd){
+  if(isDNF(coureur,sd)) return 'row-dnf';
+  if(!gcPos){
+    const g=gapVs15(coureur,sd);
+    if(g===Infinity||g===null) return 'row-lost';
+    if(g<0) return 'row-top15'; // devant la 15e mais pos pas capturée
+    if(g<180) return 'row-near15';
+    if(g<900) return 'row-far15';
+    return 'row-lost';
+  }
+  if(gcPos<=10) return 'row-top10';
+  if(gcPos<=15) return 'row-top15';
+  const g=gapVs15(coureur,sd);
+  if(g===Infinity||g===null) return 'row-lost';
+  if(g<180) return 'row-near15';
+  if(g<900) return 'row-far15';
+  return 'row-lost';
+}
+
+function getBuckets(rows,sd){
+  let top15=0,near=0,far=0,out=0;
+  rows.forEach(r=>{
+    if(isDNF(r.coureur,sd)){out++;return;}
+    const pos=r.gcPos;
+    if(pos&&pos<=15){top15++;return;}
+    const g=gapVs15(r.coureur,sd);
+    if(g===Infinity||g===null){out++;return;}
+    if(g<180) near++;
+    else if(g<900) far++;
+    else out++;
+  });
+  return{top15,near,far,out};
+}
+
 function applyRules(pName,sd){
   const prono=PRONOSTICS[pName];
   const sameDay=(sd.dnfSameAsRes||{})[pName];
-  let list=[...prono.top10],resActif=false,resBloque=false;
+  let list=[...prono.top10],resActif=false,resBloque=false,replacedName=null;
   const idx=list.findIndex(c=>isDNF(c,sd));
   if(idx!==-1){
+    replacedName=list[idx];
     if(sameDay||isDNF(prono.res,sd)){resBloque=true;}
     else{list.splice(idx,1);list.push(prono.res);resActif=true;}
   }
-  return{list,resActif,resBloque};
+  return{list,resActif,resBloque,replacedName};
 }
 
 function computeScores(sd){
   const out={};
   for(const[name] of Object.entries(PRONOSTICS)){
-    const{list,resActif,resBloque}=applyRules(name,sd);
+    const{list,resActif,resBloque,replacedName}=applyRules(name,sd);
     let total=0,rows=[];
     list.forEach((coureur,i)=>{
       const dnf=isDNF(coureur,sd);
@@ -245,9 +346,9 @@ function computeScores(sd){
       const pts=(gcPos&&PTS_GC[gcPos])?PTS_GC[gcPos]:0;
       const score=pts*mult;
       total+=score;
-      rows.push({coureur,gcPos,mult,pts,score,dnf,isRes:resActif&&i===list.length-1,team:entry?entry.team:''});
+      rows.push({coureur,gcPos,mult,pts,score,dnf,isRes:resActif&&i===list.length-1});
     });
-    out[name]={total:Math.round(total*10)/10,rows,resActif,resBloque};
+    out[name]={total:Math.round(total*10)/10,rows,resActif,resBloque,replacedName};
   }
   return out;
 }
@@ -261,7 +362,7 @@ function renderStageHeader(n){
       <div class="stage-route">${s.dep} → ${s.arr}</div>
       <div class="stage-meta">
         <span>&#128197; ${s.date}</span>
-        <span>&#128739; ${s.km} km</span>
+        <span>${s.km} km</span>
         <span class="stype ${s.type}">${s.label}</span>
       </div>
     </div>
@@ -287,39 +388,50 @@ function renderAll(){
   curScores=scores;
   const sorted=Object.entries(scores).sort((a,b)=>b[1].total-a[1].total);
 
+  // Alertes
   const az=document.getElementById('alerts');
   az.innerHTML='';
   for(const[name,data] of Object.entries(scores)){
     const prono=PRONOSTICS[name];
     const firstDNF=prono.top10.find(c=>isDNF(c,sd));
     if(firstDNF&&data.resBloque)
-      az.innerHTML+=`<div class="alert"><strong>${name}</strong> — ${firstDNF} (DNF) mais réserviste ${prono.res} aussi abandonné le même jour → pas de substitution.</div>`;
+      az.innerHTML+=`<div class="alert"><strong>${name}</strong> — ${firstDNF} a abandonné, mais le réserviste (${prono.res}) aussi le même jour → pas de substitution.</div>`;
     else if(firstDNF&&data.resActif)
       az.innerHTML+=`<div class="alert-info"><strong>${name}</strong> — Réserviste activé : ${prono.res} remplace ${firstDNF} (DNF).</div>`;
   }
 
+  // Cartes avec buckets (2)
   const cards=document.getElementById('cards');
   cards.innerHTML='';
   sorted.forEach(([name,data],idx)=>{
     const rc=idx===0?'r1':idx===1?'r2':idx===2?'r3':'rN';
+    const b=getBuckets(data.rows,sd);
     cards.innerHTML+=`
     <div class="pcard${idx===0?' gold':''}" onclick="showDetail('${name}')">
       <div class="pc-head"><span class="pc-name">${name}</span><span class="rb ${rc}">${idx+1}</span></div>
-      <div class="pc-pts">${data.total.toFixed(1)}</div><div class="pc-sub">points</div>
-      <div class="pc-rows">
-        ${data.rows.slice(0,5).map(r=>`<div class="pc-row"><span class="cn${r.dnf?' dnf':''}">${r.coureur}</span><span class="cp">${r.score>0?r.score.toFixed(1):'—'}</span></div>`).join('')}
-        <div style="font-size:11px;color:#999;margin-top:4px">+ 5 autres · cliquer pour détail</div>
+      <div class="pc-pts">${data.total.toFixed(1)}</div>
+      <div class="pc-sub">points · cliquer pour détail</div>
+      <div class="pc-buckets">
+        <div class="bucket b-green" title="Dans le top 15"><div class="bucket-val">${b.top15}</div><div class="bucket-lbl">Dans le top 15</div></div>
+        <div class="bucket b-lime"  title="À moins de 3 min du top 15"><div class="bucket-val">${b.near}</div><div class="bucket-lbl">À &lt;3 min du top 15</div></div>
+        <div class="bucket b-orange"title="À 3–15 min du top 15"><div class="bucket-val">${b.far}</div><div class="bucket-lbl">Distancés (3–15 min)</div></div>
+        <div class="bucket b-red"   title="Hors top 15 ou hors course"><div class="bucket-val">${b.out}</div><div class="bucket-lbl">Abandons / &gt;15 min</div></div>
       </div>
     </div>`;
   });
 
+  // Classement général top 30 (3)
   const gcBody=document.getElementById('gc-body');
   gcBody.innerHTML='';
-  sd.gc.slice(0,20).forEach(r=>{
+  const gcClassement=sd.gc.filter(r=>!isDNF(r.name,sd)).slice(0,30);
+  const gcDNF=sd.gc.filter(r=>isDNF(r.name,sd));
+  [...gcClassement,...gcDNF].forEach(r=>{
+    const dnf=isDNF(r.name,sd);
     const bc=r.pos===1?'p1':r.pos===2?'p2':r.pos===3?'p3':'pN';
     const proTag=Object.values(PRONOSTICS).some(p=>[...p.top10,p.res].some(c=>match(r.name,c)))?'<span class="ptag">pronostiqué</span>':'';
-    const dnfT=isDNF(r.name,sd)?'<span class="dnftag">DNF</span>':'';
-    gcBody.innerHTML+=`<tr><td><span class="pb ${bc}">${r.pos}</span></td><td>${r.name}${proTag}${dnfT}</td><td style="color:#666;font-size:12px">${r.team}</td><td style="font-family:monospace;font-size:12px;color:#666">${r.time}</td></tr>`;
+    const dnfTag=dnf?'<span class="dnftag">DNF</span>':'';
+    const style=dnf?'style="opacity:.5"':'';
+    gcBody.innerHTML+=`<tr ${style}><td><span class="pb ${bc}">${dnf?'—':r.pos}</span></td><td>${r.name}${proTag}${dnfTag}</td><td style="color:#666;font-size:12px">${r.team}</td><td style="font-family:monospace;font-size:12px;color:#666">${dnf?'—':r.time}</td></tr>`;
   });
 
   renderPronoList();
@@ -340,26 +452,47 @@ function renderPronoList(){
 
 function showDetail(name){
   const data=curScores[name];if(!data)return;
-  const prono=PRONOSTICS[name];const sd=HISTORY[curStage];
+  const prono=PRONOSTICS[name];
+  const sd=HISTORY[curStage];
   document.getElementById('dname').textContent=name+' — Étape '+curStage;
-  const tb=document.getElementById('dbody');tb.innerHTML='';
+  const tb=document.getElementById('dbody');
+  tb.innerHTML='';
   let tot=0;
   data.rows.forEach((r,i)=>{
-    const gcStr=r.dnf?'<em style="color:#e8052b;font-size:11px">DNF</em>':(r.gcPos?`${r.gcPos}e`:'—');
+    const gcStr=r.dnf?'<em style="color:#b91c1c;font-size:11px">DNF</em>':(r.gcPos?`${r.gcPos}e`:'<span style="color:#999">—</span>');
     tot+=r.score;
     const resTag=r.isRes?'<span class="rtag">réserviste</span>':'';
-    tb.innerHTML+=`<tr${r.dnf?' class="dnf-row"':''}><td>${i+1}<span class="mult">×${r.mult}</span></td><td>${r.coureur}${resTag}</td><td>${gcStr}</td><td>${r.score>0?r.score.toFixed(1):'0'}</td></tr>`;
+    const cls=rowClass(r.coureur,r.gcPos,sd);
+    tb.innerHTML+=`<tr class="${cls}"><td>${i+1}<span class="mult">×${r.mult}</span></td><td>${r.coureur}${resTag}</td><td>${gcStr}</td><td>${r.score>0?r.score.toFixed(1):'0'}</td></tr>`;
   });
-  tb.innerHTML+=`<tr class="tot"><td colspan="3">Total</td><td>${(Math.round(tot*10)/10).toFixed(1)}</td></tr>`;
+
+  // Ligne total
+  tb.innerHTML+=`<tr class="tot-row"><td colspan="3">Total</td><td>${(Math.round(tot*10)/10).toFixed(1)}</td></tr>`;
+
+  // Ligne réserviste (toujours affichée)
   const resEntry=sd?getGC(prono.res,sd.gc):null;
   const resPos=sd&&isDNF(prono.res,sd)?'DNF':(resEntry?`${resEntry.pos}e au GC`:'—');
   const resNote=data.resActif?' (actif)':data.resBloque?' (bloqué)':'';
-  tb.innerHTML+=`<tr style="opacity:.7"><td style="color:#666">Réserviste</td><td>${prono.res}<span style="color:#e8052b;font-size:11px;margin-left:4px">${resNote}</span></td><td style="color:#666">${resPos}</td><td>—</td></tr>`;
-  if(curTab==='pronostics'){document.getElementById('prono-list').style.display='none';document.getElementById('prono-detail').classList.add('active');}
-  else{showTab('pronostics',document.querySelectorAll('.tab')[2]);document.getElementById('prono-list').style.display='none';document.getElementById('prono-detail').classList.add('active');}
+  tb.innerHTML+=`<tr style="opacity:.75"><td style="color:#666">Rés.</td><td>${prono.res}<span style="color:#e8052b;font-size:11px;margin-left:4px">${resNote}</span></td><td style="color:#666;font-size:12px">${resPos}</td><td style="color:#999;text-align:right">—</td></tr>`;
+
+  // 1.1 : ligne coureur remplacé si réserviste actif
+  if(data.resActif && data.replacedName){
+    tb.innerHTML+=`<tr class="replaced-row"><td colspan="4" style="padding:7px 12px">↳ Remplace ${data.replacedName} (abandonné / hors course)</td></tr>`;
+  }
+
+  if(curTab==='pronostics'){
+    document.getElementById('prono-list').style.display='none';
+    document.getElementById('prono-detail').classList.add('active');
+  } else {
+    showTab('pronostics',document.querySelectorAll('.tab')[2]);
+    document.getElementById('prono-list').style.display='none';
+    document.getElementById('prono-detail').classList.add('active');
+  }
 }
+
 function showDetailFromProno(name){showDetail(name);}
 function backList(){document.getElementById('prono-list').style.display='';document.getElementById('prono-detail').classList.remove('active');}
+
 function showTab(tab,btn){
   curTab=tab;
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
