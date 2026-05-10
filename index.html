@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Giro d'Italia 2026 — Pronostics</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,sans-serif;background:#f8f8f6;color:#1a1a1a;padding:1rem}
+.app{max-width:700px;margin:0 auto}
+.header{display:flex;align-items:center;gap:12px;margin-bottom:1.25rem}
+.hico{width:40px;height:40px;border-radius:8px;background:#e8052b;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.hico svg{width:22px;height:22px;fill:white}
+.htitle{font-size:20px;font-weight:500}
+.hsub{font-size:13px;color:#666}
+.stage-selector{display:flex;align-items:center;gap:10px;margin-bottom:1rem;flex-wrap:wrap}
+.stage-selector label{font-size:13px;color:#666;white-space:nowrap}
+.stage-selector select{font-size:14px;padding:7px 12px;border-radius:8px;border:1px solid #ddd;background:#fff;cursor:pointer;flex:1;min-width:0}
+.nav-btns{display:flex;gap:6px}
+.nbtn{padding:6px 12px;font-size:13px;cursor:pointer;border-radius:8px;border:1px solid #ddd;background:#fff}
+.nbtn:hover:not(:disabled){background:#f0f0f0}
+.nbtn:disabled{opacity:.35;cursor:default}
+.stage-card{background:#f0f0ee;border-radius:12px;padding:14px 16px;margin-bottom:1.25rem;display:flex;flex-wrap:wrap;align-items:center;gap:12px}
+.stage-num{font-size:22px;font-weight:500;color:#e8052b;white-space:nowrap;min-width:70px}
+.stage-info{display:flex;flex-direction:column;gap:4px;flex:1}
+.stage-route{font-size:15px;font-weight:500}
+.stage-meta{display:flex;gap:10px;flex-wrap:wrap;font-size:12px;color:#666;align-items:center}
+.stype{font-size:11px;padding:3px 10px;border-radius:20px;font-weight:500;white-space:nowrap}
+.t-plat{background:#dbeafe;color:#1e40af}
+.t-acc{background:#dcfce7;color:#166534}
+.t-mont{background:#fef9c3;color:#854d0e}
+.t-clm{background:#fde8ec;color:#9b1c1c}
+.tabs{display:flex;gap:4px;border-bottom:1px solid #e5e5e5;margin-bottom:1.5rem}
+.tab{padding:8px 16px;font-size:14px;cursor:pointer;border:none;background:none;color:#666;border-bottom:2px solid transparent;margin-bottom:-1px}
+.tab.active{color:#e8052b;border-bottom-color:#e8052b;font-weight:500}
+.section{display:none}.section.active{display:block}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem}
+@media(max-width:500px){.grid2{grid-template-columns:1fr}}
+.pcard{background:#fff;border:1px solid #e5e5e5;border-radius:12px;padding:1rem 1.25rem;cursor:pointer;transition:border-color .15s}
+.pcard:hover{border-color:#bbb}
+.pcard.gold{border-color:#e8c20a;border-width:2px}
+.pc-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.pc-name{font-size:15px;font-weight:500}
+.rb{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:500}
+.r1{background:#fef9c3;color:#854d0e}.r2{background:#f1f5f9;color:#334155}.r3{background:#fff7ed;color:#92400e}.rN{background:#f0f0f0;color:#666}
+.pc-pts{font-size:26px;font-weight:500}
+.pc-sub{font-size:12px;color:#666}
+.pc-rows{margin-top:10px;border-top:1px solid #f0f0f0;padding-top:8px;display:flex;flex-direction:column;gap:3px}
+.pc-row{display:flex;justify-content:space-between;font-size:12px}
+.cn{color:#666}.cn.dnf{text-decoration:line-through;opacity:.45}
+.cp{font-weight:500}
+.tbl-wrap{background:#fff;border:1px solid #e5e5e5;border-radius:12px;overflow:hidden;margin-bottom:1rem}
+.tbl{width:100%;border-collapse:collapse}
+.tbl thead tr{background:#f8f8f6}
+.tbl th{font-size:12px;font-weight:500;color:#666;text-align:left;padding:10px 14px}
+.tbl td{font-size:13px;padding:9px 14px;border-top:1px solid #f0f0f0}
+.tbl tr:hover td{background:#fafafa}
+.pb{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;font-size:12px;font-weight:500}
+.p1{background:#fef9c3;color:#854d0e}.p2{background:#f1f5f9;color:#334155}.p3{background:#fff7ed;color:#92400e}.pN{background:#f0f0f0;color:#666}
+.ptag{font-size:11px;padding:2px 8px;border-radius:20px;background:#fde8ec;color:#9b1c1c;margin-left:6px}
+.dnftag{font-size:11px;padding:2px 7px;border-radius:20px;background:#fef9c3;color:#854d0e;margin-left:6px}
+.back-btn{display:flex;align-items:center;gap:10px;margin-bottom:1.5rem;cursor:pointer;color:#666;font-size:14px}
+.back-btn:hover{color:#1a1a1a}
+.detail-title{font-size:18px;font-weight:500;color:#1a1a1a}
+.dtbl th{font-size:12px;font-weight:500;color:#666;padding:8px 12px;background:#f8f8f6;text-align:left}
+.dtbl td{font-size:13px;padding:9px 12px;border-top:1px solid #f0f0f0}
+.dtbl td:last-child{text-align:right;font-weight:500}
+.tot td{font-weight:500;font-size:14px;background:#f8f8f6}
+.dnf-row td{opacity:.45}
+.mult{font-size:11px;color:#999;margin-left:4px}
+.rtag{font-size:11px;padding:1px 6px;border-radius:10px;background:#fde8ec;color:#9b1c1c;margin-left:5px}
+.no-data{text-align:center;padding:2rem;color:#666;font-size:14px;grid-column:1/-1}
+.detail-view{display:none}.detail-view.active{display:block}
+.alert{background:#fef3c7;border:1px solid #fde68a;border-radius:8px;padding:10px 14px;font-size:13px;color:#92400e;margin-bottom:.75rem;display:flex;gap:8px;align-items:flex-start}
+.alert-info{background:#f8f8f6;border-radius:8px;padding:10px 14px;font-size:13px;color:#666;margin-bottom:.75rem;display:flex;gap:8px}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="header">
+  <div class="hico"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2zm0 2a8 8 0 0 1 8 8 8 8 0 0 1-8 8 8 8 0 0 1-8-8 8 8 0 0 1 8-8zm0 2L9.5 9H7l2 3-1 4 4-2 4 2-1-4 2-3h-2.5L12 6z"/></svg></div>
+  <div><div class="htitle">Giro d'Italia 2026</div><div class="hsub">Concours de pronostics — 6 participants</div></div>
+</div>
+
+<div class="stage-selector">
+  <label for="sel">Étape</label>
+  <select id="sel" onchange="changeStage(+this.value)"></select>
+  <div class="nav-btns">
+    <button class="nbtn" id="btn-prev" onclick="navigate(-1)">&#8249;</button>
+    <button class="nbtn" id="btn-next" onclick="navigate(+1)">&#8250;</button>
+  </div>
+</div>
+
+<div id="stage-hd"></div>
+
+<div class="tabs">
+  <button class="tab active" onclick="showTab('classement',this)">Classement</button>
+  <button class="tab" onclick="showTab('gc',this)">Classement général</button>
+  <button class="tab" onclick="showTab('pronostics',this)">Pronostics</button>
+</div>
+<div id="tab-classement" class="section active"><div id="alerts"></div><div class="grid2" id="cards"></div></div>
+<div id="tab-gc" class="section"><div class="tbl-wrap"><table class="tbl"><thead><tr><th>Pos.</th><th>Coureur</th><th>Équipe</th><th>Écart</th></tr></thead><tbody id="gc-body"></tbody></table></div></div>
+<div id="tab-pronostics" class="section">
+  <div class="grid2" id="prono-list"></div>
+  <div class="detail-view" id="prono-detail">
+    <div class="back-btn" onclick="backList()">&#8592; <span class="detail-title" id="dname"></span></div>
+    <div class="tbl-wrap"><table class="tbl dtbl"><thead><tr><th>Rang parié</th><th>Coureur</th><th>Pos. GC</th><th>Points</th></tr></thead><tbody id="dbody"></tbody></table></div>
+  </div>
+</div>
+</div>
+
+<script>
+const MULTS=[10,9,8,6,5.5,5,4.5,4,3.5,3];
+const PTS_GC={1:15,2:13,3:11,4:9,5:8,6:7,7:6,8:5,9:4,10:3,11:2,12:2,13:1.5,14:1.5,15:1.5};
+const PRONOSTICS={
+  Franziska:{top10:['J. Vingegaard','A. Yates','G. Pellizzari','E. Bernal','F. Gall','E. Mas','B. O\'Connor','J.A. Cepeda','G. Ciccone','M. Storer'],res:'S. Kuss'},
+  Gérard:   {top10:['J. Vingegaard','A. Yates','G. Pellizzari','F. Gall','B. O\'Connor','M. Storer','T. Arensman','S. Buitrago','J. Vine','J. Hindley'],res:'E. Bernal'},
+  Mathias:  {top10:['J. Vingegaard','G. Pellizzari','E. Bernal','F. Gall','T. Arensman','D. Gee-West','A. Yates','M. Storer','B. O\'Connor','E. Mas'],res:'F. Zana'},
+  Quentin:  {top10:['J. Vingegaard','G. Pellizzari','F. Gall','J. Hindley','E. Bernal','T. Arensman','A. Pinarello','D. Gee-West','A. Yates','B. O\'Connor'],res:'D. Caruso'},
+  Yannick:  {top10:['J. Vingegaard','G. Pellizzari','F. Gall','E. Bernal','B. O\'Connor','A. Yates','D. Gee-West','G. Ciccone','T. Arensman','J. Hindley'],res:'E. Mas'},
+  Zoé:      {top10:['J. Vingegaard','G. Pellizzari','J. Hindley','D. Gee-West','A. Pinarello','A. Yates','T. Arensman','F. Gall','B. O\'Connor','E. Bernal'],res:'J. Vine'}
+};
+
+// Classification Wikipedia exacte
+const STAGES=[
+  {n:1, date:'08.05.2026',dep:'Nessebar',           arr:'Burgas',           km:147,  type:'t-plat',label:'Plat'},
+  {n:2, date:'09.05.2026',dep:'Burgas',              arr:'Veliko Tarnovo',   km:221,  type:'t-acc', label:'Accidentée'},
+  {n:3, date:'10.05.2026',dep:'Plovdiv',             arr:'Sofia',            km:175,  type:'t-plat',label:'Plat'},
+  {n:4, date:'12.05.2026',dep:'Catanzaro',           arr:'Cosenza',          km:138,  type:'t-plat',label:'Plat'},
+  {n:5, date:'13.05.2026',dep:'Praia a Mare',        arr:'Potenza',          km:203,  type:'t-acc', label:'Accidentée'},
+  {n:6, date:'14.05.2026',dep:'Paestum',             arr:'Naples',           km:142,  type:'t-plat',label:'Plat'},
+  {n:7, date:'15.05.2026',dep:'Formia',              arr:'Blockhaus',        km:244,  type:'t-mont',label:'Montagne'},
+  {n:8, date:'16.05.2026',dep:'Chieti',              arr:'Fermo',            km:156,  type:'t-acc', label:'Accidentée'},
+  {n:9, date:'17.05.2026',dep:'Cervia',              arr:'Corno alle Scale', km:184,  type:'t-acc', label:'Accidentée'},
+  {n:10,date:'19.05.2026',dep:'Viareggio',           arr:'Massa (CLM)',      km:42,   type:'t-clm', label:'Contre-la-montre'},
+  {n:11,date:'20.05.2026',dep:'Porcari',             arr:'Chiavari',         km:195,  type:'t-acc', label:'Accidentée'},
+  {n:12,date:'21.05.2026',dep:'Imperia',             arr:'Novi Ligure',      km:175,  type:'t-plat',label:'Plat'},
+  {n:13,date:'22.05.2026',dep:'Alessandria',         arr:'Verbania',         km:189,  type:'t-acc', label:'Accidentée'},
+  {n:14,date:'23.05.2026',dep:'Aosta',               arr:'Pila',             km:133,  type:'t-mont',label:'Montagne'},
+  {n:15,date:'24.05.2026',dep:'Voghera',             arr:'Milan',            km:157,  type:'t-plat',label:'Plat'},
+  {n:16,date:'26.05.2026',dep:'Bellinzona',          arr:'Carì',             km:113,  type:'t-mont',label:'Montagne'},
+  {n:17,date:'27.05.2026',dep:'Cassano d\'Adda',     arr:'Andalo',           km:202,  type:'t-acc', label:'Accidentée'},
+  {n:18,date:'28.05.2026',dep:'Fai della Paganella', arr:'Pieve di Soligo',  km:171,  type:'t-plat',label:'Plat'},
+  {n:19,date:'29.05.2026',dep:'Feltre',              arr:'Alleghe',          km:151,  type:'t-mont',label:'Montagne'},
+  {n:20,date:'30.05.2026',dep:'Gemona del Friuli',   arr:'Piancavallo',      km:200,  type:'t-mont',label:'Montagne'},
+  {n:21,date:'31.05.2026',dep:'Rome',                arr:'Rome',             km:131,  type:'t-plat',label:'Plat'},
+];
+
+const GC1=[
+  {pos:1,name:'P. Magnier',     team:'Soudal QS',    time:'en tête'},
+  {pos:2,name:'T.L. Andresen',  team:'Soudal QS',    time:'+0:00'},
+  {pos:3,name:'J. Milan',       team:'Lidl-Trek',    time:'+0:00'},
+  {pos:4,name:'G. Thomas Silva',team:'XDS Astana',   time:'+0:00'},
+  {pos:5,name:'E. Vernon',      team:'NSN',          time:'+0:00'},
+  {pos:6,name:'J. Kulset',      team:'Uno-X',        time:'+0:00'},
+  {pos:7,name:'M. Tjøtta',      team:'Uno-X',        time:'+0:00'},
+  {pos:8,name:'L. Van Eetvelt', team:'Lotto',        time:'+0:00'},
+  {pos:9,name:'D. Rafferty',    team:'EF',           time:'+0:00'},
+  {pos:10,name:'J. Christen',   team:'UAE',          time:'+0:00'},
+  {pos:11,name:'J. Hirt',       team:'Astana',       time:'+0:00'},
+  {pos:12,name:'J. Hindley',    team:'Red Bull-Bora',time:'+0:00'},
+  {pos:13,name:'C. Scaroni',    team:'XDS Astana',   time:'+0:00'},
+  {pos:14,name:'D. Caruso',     team:'Bahrain',      time:'+0:00'},
+  {pos:15,name:'E. Mas',        team:'Cofidis',      time:'+0:00'},
+  {pos:16,name:'J. Vingegaard', team:'Visma',        time:'+0:00'},
+  {pos:17,name:'B. O\'Connor',  team:'Jayco',        time:'+0:00'},
+  {pos:18,name:'J.P. López',    team:'Movistar',     time:'+0:00'},
+  {pos:19,name:'J. Romo',       team:'Astana',       time:'+0:00'},
+  {pos:20,name:'E. Rubio',      team:'Movistar',     time:'+0:00'},
+  {pos:26,name:'M. Storer',     team:'Tudor',        time:'+0:00'},
+  {pos:27,name:'F. Gall',       team:'Decathlon',    time:'+0:00'},
+  {pos:30,name:'G. Pellizzari', team:'Red Bull-Bora',time:'+0:00'},
+  {pos:41,name:'A. Yates',      team:'UAE',          time:'+0:00'},
+  {pos:45,name:'D. Gee-West',   team:'UAE',          time:'+0:00'},
+];
+const GC2=[
+  {pos:1,name:'G. Thomas Silva',team:'XDS Astana',   time:'en tête'},
+  {pos:2,name:'F. Stork',       team:'Tudor',        time:'+0:04'},
+  {pos:3,name:'E. Bernal',      team:'Ineos',        time:'+0:04'},
+  {pos:4,name:'T. Arensman',    team:'Ineos',        time:'+0:06'},
+  {pos:5,name:'G. Ciccone',     team:'Lidl-Trek',    time:'+0:06'},
+  {pos:6,name:'J. Christen',    team:'UAE',          time:'+0:10'},
+  {pos:7,name:'J. Kulset',      team:'Uno-X',        time:'+0:10'},
+  {pos:8,name:'L. Van Eetvelt', team:'Lotto',        time:'+0:10'},
+  {pos:9,name:'M. Tjøtta',      team:'Uno-X',        time:'+0:10'},
+  {pos:10,name:'D. Rafferty',   team:'EF',           time:'+0:10'},
+  {pos:11,name:'J. Hirt',       team:'Astana',       time:'+0:10'},
+  {pos:12,name:'J. Hindley',    team:'Red Bull-Bora',time:'+0:10'},
+  {pos:13,name:'C. Scaroni',    team:'XDS Astana',   time:'+0:10'},
+  {pos:14,name:'D. Caruso',     team:'Bahrain',      time:'+0:10'},
+  {pos:15,name:'E. Mas',        team:'Cofidis',      time:'+0:10'},
+  {pos:16,name:'J. Vingegaard', team:'Visma',        time:'+0:10'},
+  {pos:17,name:'B. O\'Connor',  team:'Jayco',        time:'+0:10'},
+  {pos:18,name:'J.P. López',    team:'Movistar',     time:'+0:10'},
+  {pos:19,name:'J. Romo',       team:'Astana',       time:'+0:10'},
+  {pos:20,name:'E. Rubio',      team:'Movistar',     time:'+0:10'},
+  {pos:26,name:'M. Storer',     team:'Tudor',        time:'+0:10'},
+  {pos:27,name:'F. Gall',       team:'Decathlon',    time:'+0:10'},
+  {pos:30,name:'G. Pellizzari', team:'Red Bull-Bora',time:'+0:10'},
+  {pos:41,name:'D. Gee-West',   team:'UAE',          time:'+1:11'},
+  {pos:99,name:'A. Yates',      team:'UAE',          time:'+13:46'},
+];
+
+const HISTORY={
+  1:{gc:GC1,dnf:['Matteo Moschetti'],dnfSameAsRes:{}},
+  2:{gc:GC2,dnf:['J. Vine','M. Soler','Å. Holter'],dnfSameAsRes:{'Zoé':true}}
+};
+
+let curStage=2,curTab='classement',curScores={};
+
+function norm(s){return s.toLowerCase().replace(/[^a-z]/g,'');}
+function match(a,b){
+  if(norm(a)===norm(b))return true;
+  const ap=a.toLowerCase().split(/[\s\-\.]+/).filter(Boolean);
+  const bp=b.toLowerCase().split(/[\s\-\.]+/).filter(Boolean);
+  const aL=ap[ap.length-1],bL=bp[bp.length-1];
+  if(aL&&bL&&norm(aL)===norm(bL))return true;
+  if(ap.some(x=>x.length>3&&bp.some(y=>y.length>3&&norm(x)===norm(y))))return true;
+  return false;
+}
+function isDNF(name,sd){return(sd.dnf||[]).some(d=>match(d,name));}
+function getGC(name,gc){return gc.find(r=>match(r.name,name))||null;}
+
+function applyRules(pName,sd){
+  const prono=PRONOSTICS[pName];
+  const sameDay=(sd.dnfSameAsRes||{})[pName];
+  let list=[...prono.top10],resActif=false,resBloque=false;
+  const idx=list.findIndex(c=>isDNF(c,sd));
+  if(idx!==-1){
+    if(sameDay||isDNF(prono.res,sd)){resBloque=true;}
+    else{list.splice(idx,1);list.push(prono.res);resActif=true;}
+  }
+  return{list,resActif,resBloque};
+}
+
+function computeScores(sd){
+  const out={};
+  for(const[name] of Object.entries(PRONOSTICS)){
+    const{list,resActif,resBloque}=applyRules(name,sd);
+    let total=0,rows=[];
+    list.forEach((coureur,i)=>{
+      const dnf=isDNF(coureur,sd);
+      const entry=getGC(coureur,sd.gc);
+      const gcPos=(!dnf&&entry)?entry.pos:null;
+      const mult=MULTS[i];
+      const pts=(gcPos&&PTS_GC[gcPos])?PTS_GC[gcPos]:0;
+      const score=pts*mult;
+      total+=score;
+      rows.push({coureur,gcPos,mult,pts,score,dnf,isRes:resActif&&i===list.length-1,team:entry?entry.team:''});
+    });
+    out[name]={total:Math.round(total*10)/10,rows,resActif,resBloque};
+  }
+  return out;
+}
+
+function renderStageHeader(n){
+  const s=STAGES[n-1];
+  document.getElementById('stage-hd').innerHTML=`
+  <div class="stage-card">
+    <div class="stage-num">Étape ${s.n}</div>
+    <div class="stage-info">
+      <div class="stage-route">${s.dep} → ${s.arr}</div>
+      <div class="stage-meta">
+        <span>&#128197; ${s.date}</span>
+        <span>&#128739; ${s.km} km</span>
+        <span class="stype ${s.type}">${s.label}</span>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderAll(){
+  const sd=HISTORY[curStage]||null;
+  renderStageHeader(curStage);
+  document.getElementById('btn-prev').disabled=curStage<=1;
+  document.getElementById('btn-next').disabled=curStage>=21;
+
+  if(!sd){
+    const s=STAGES[curStage-1];
+    document.getElementById('alerts').innerHTML='';
+    document.getElementById('cards').innerHTML=`<div class="no-data">Étape non encore disputée<br><span style="font-size:12px">${s.date} · ${s.dep} → ${s.arr}</span></div>`;
+    document.getElementById('gc-body').innerHTML=`<tr><td colspan="4" class="no-data">Résultats à venir</td></tr>`;
+    document.getElementById('prono-list').innerHTML=`<div class="no-data">Résultats à venir</div>`;
+    curScores={};return;
+  }
+
+  const scores=computeScores(sd);
+  curScores=scores;
+  const sorted=Object.entries(scores).sort((a,b)=>b[1].total-a[1].total);
+
+  const az=document.getElementById('alerts');
+  az.innerHTML='';
+  for(const[name,data] of Object.entries(scores)){
+    const prono=PRONOSTICS[name];
+    const firstDNF=prono.top10.find(c=>isDNF(c,sd));
+    if(firstDNF&&data.resBloque)
+      az.innerHTML+=`<div class="alert"><strong>${name}</strong> — ${firstDNF} (DNF) mais réserviste ${prono.res} aussi abandonné le même jour → pas de substitution.</div>`;
+    else if(firstDNF&&data.resActif)
+      az.innerHTML+=`<div class="alert-info"><strong>${name}</strong> — Réserviste activé : ${prono.res} remplace ${firstDNF} (DNF).</div>`;
+  }
+
+  const cards=document.getElementById('cards');
+  cards.innerHTML='';
+  sorted.forEach(([name,data],idx)=>{
+    const rc=idx===0?'r1':idx===1?'r2':idx===2?'r3':'rN';
+    cards.innerHTML+=`
+    <div class="pcard${idx===0?' gold':''}" onclick="showDetail('${name}')">
+      <div class="pc-head"><span class="pc-name">${name}</span><span class="rb ${rc}">${idx+1}</span></div>
+      <div class="pc-pts">${data.total.toFixed(1)}</div><div class="pc-sub">points</div>
+      <div class="pc-rows">
+        ${data.rows.slice(0,5).map(r=>`<div class="pc-row"><span class="cn${r.dnf?' dnf':''}">${r.coureur}</span><span class="cp">${r.score>0?r.score.toFixed(1):'—'}</span></div>`).join('')}
+        <div style="font-size:11px;color:#999;margin-top:4px">+ 5 autres · cliquer pour détail</div>
+      </div>
+    </div>`;
+  });
+
+  const gcBody=document.getElementById('gc-body');
+  gcBody.innerHTML='';
+  sd.gc.slice(0,20).forEach(r=>{
+    const bc=r.pos===1?'p1':r.pos===2?'p2':r.pos===3?'p3':'pN';
+    const proTag=Object.values(PRONOSTICS).some(p=>[...p.top10,p.res].some(c=>match(r.name,c)))?'<span class="ptag">pronostiqué</span>':'';
+    const dnfT=isDNF(r.name,sd)?'<span class="dnftag">DNF</span>':'';
+    gcBody.innerHTML+=`<tr><td><span class="pb ${bc}">${r.pos}</span></td><td>${r.name}${proTag}${dnfT}</td><td style="color:#666;font-size:12px">${r.team}</td><td style="font-family:monospace;font-size:12px;color:#666">${r.time}</td></tr>`;
+  });
+
+  renderPronoList();
+}
+
+function renderPronoList(){
+  const pl=document.getElementById('prono-list');
+  pl.innerHTML='';
+  if(!Object.keys(curScores).length){pl.innerHTML='<div class="no-data">Résultats à venir</div>';return;}
+  Object.keys(PRONOSTICS).forEach(name=>{
+    const d=curScores[name];
+    const tag=d.resActif?'<span class="rtag">réserviste actif</span>':d.resBloque?'<span style="font-size:11px;color:#854d0e;margin-left:6px">⚠ rés. bloqué</span>':'';
+    pl.innerHTML+=`<div class="pcard" onclick="showDetailFromProno('${name}')"><div class="pc-head"><span class="pc-name">${name}${tag}</span>›</div><div style="font-size:13px;color:#666">${d.total.toFixed(1)} pts</div></div>`;
+  });
+  document.getElementById('prono-list').style.display='';
+  document.getElementById('prono-detail').classList.remove('active');
+}
+
+function showDetail(name){
+  const data=curScores[name];if(!data)return;
+  const prono=PRONOSTICS[name];const sd=HISTORY[curStage];
+  document.getElementById('dname').textContent=name+' — Étape '+curStage;
+  const tb=document.getElementById('dbody');tb.innerHTML='';
+  let tot=0;
+  data.rows.forEach((r,i)=>{
+    const gcStr=r.dnf?'<em style="color:#e8052b;font-size:11px">DNF</em>':(r.gcPos?`${r.gcPos}e`:'—');
+    tot+=r.score;
+    const resTag=r.isRes?'<span class="rtag">réserviste</span>':'';
+    tb.innerHTML+=`<tr${r.dnf?' class="dnf-row"':''}><td>${i+1}<span class="mult">×${r.mult}</span></td><td>${r.coureur}${resTag}</td><td>${gcStr}</td><td>${r.score>0?r.score.toFixed(1):'0'}</td></tr>`;
+  });
+  tb.innerHTML+=`<tr class="tot"><td colspan="3">Total</td><td>${(Math.round(tot*10)/10).toFixed(1)}</td></tr>`;
+  const resEntry=sd?getGC(prono.res,sd.gc):null;
+  const resPos=sd&&isDNF(prono.res,sd)?'DNF':(resEntry?`${resEntry.pos}e au GC`:'—');
+  const resNote=data.resActif?' (actif)':data.resBloque?' (bloqué)':'';
+  tb.innerHTML+=`<tr style="opacity:.7"><td style="color:#666">Réserviste</td><td>${prono.res}<span style="color:#e8052b;font-size:11px;margin-left:4px">${resNote}</span></td><td style="color:#666">${resPos}</td><td>—</td></tr>`;
+  if(curTab==='pronostics'){document.getElementById('prono-list').style.display='none';document.getElementById('prono-detail').classList.add('active');}
+  else{showTab('pronostics',document.querySelectorAll('.tab')[2]);document.getElementById('prono-list').style.display='none';document.getElementById('prono-detail').classList.add('active');}
+}
+function showDetailFromProno(name){showDetail(name);}
+function backList(){document.getElementById('prono-list').style.display='';document.getElementById('prono-detail').classList.remove('active');}
+function showTab(tab,btn){
+  curTab=tab;
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.getElementById('tab-'+tab).classList.add('active');
+  if(btn)btn.classList.add('active');
+  if(tab==='pronostics')renderPronoList();
+}
+function changeStage(n){curStage=n;renderAll();}
+function navigate(dir){const n=curStage+dir;if(n<1||n>21)return;curStage=n;document.getElementById('sel').value=n;renderAll();}
+
+const sel=document.getElementById('sel');
+STAGES.forEach(s=>{
+  const o=document.createElement('option');
+  o.value=s.n;
+  o.textContent=`Étape ${s.n} — ${s.dep} › ${s.arr}${!HISTORY[s.n]?' (à venir)':''}`;
+  if(s.n===curStage)o.selected=true;
+  sel.appendChild(o);
+});
+renderAll();
+</script>
+</body>
+</html>
