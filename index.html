@@ -2,6 +2,7 @@
 <html lang="fr">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Giro d'Italia 2026 — Pronostics</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:system-ui,sans-serif;background:#f8f8f6;color:#1a1a1a;padding:1rem}
@@ -59,7 +60,7 @@ body{font-family:system-ui,sans-serif;background:#f8f8f6;color:#1a1a1a;padding:1
 .tbl tr:hover td{background:#fafafa}
 .pb{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;font-size:12px;font-weight:500}
 .p1{background:#fef9c3;color:#854d0e}.p2{background:#f1f5f9;color:#334155}.p3{background:#fff7ed;color:#92400e}.pN{background:#f0f0f0;color:#666}
-.ptag{font-size:10px;padding:1px 5px;border-radius:20px;background:#fde8ec;color:#9b1c1c;margin-left:4px;display:inline-block;margin-top:2px}
+.ptag{font-size:10px;padding:1px 5px;border-radius:20px;background:#fde8ec;color:#9b1c1c;margin-left:4px;white-space:normal;word-break:break-word}
 .dnftag{font-size:11px;padding:2px 7px;border-radius:20px;background:#f3f4f6;color:#666;margin-left:6px}
 .back-btn{display:flex;align-items:center;gap:10px;margin-bottom:1.5rem;cursor:pointer;color:#666;font-size:14px}
 .back-btn:hover{color:#1a1a1a}
@@ -84,6 +85,20 @@ body{font-family:system-ui,sans-serif;background:#f8f8f6;color:#1a1a1a;padding:1
 .detail-view{display:none}.detail-view.active{display:block}
 .alert{background:#fef3c7;border:1px solid #fde68a;border-radius:8px;padding:10px 14px;font-size:13px;color:#92400e;margin-bottom:.75rem}
 .alert-info{background:#f8f8f6;border-radius:8px;padding:10px 14px;font-size:13px;color:#666;margin-bottom:.75rem}
+.param-btn{font-size:13px;padding:5px 9px;border-radius:8px;border:1px solid #ddd;background:#fff;color:#666;cursor:pointer;display:flex;align-items:center;line-height:1}
+.param-btn:hover{background:#f0f0f0}
+.param-btn.active{color:#e8052b;border-color:#e8052b}
+.slider-panel{background:#fff;border:1px solid #e5e5e5;border-radius:12px;padding:14px 16px;margin-bottom:1.25rem;display:none}
+.slider-panel.open{display:block}
+.slider-panel-title{font-size:11px;font-weight:500;color:#999;text-transform:uppercase;letter-spacing:.04em;margin-bottom:12px}
+.slider-val-row{display:flex;align-items:center;justify-content:center;gap:8px;font-size:13px;color:#666;margin-bottom:14px}
+.slider-badge{font-weight:500;color:#1a1a1a;background:#f0f0ee;border-radius:6px;padding:2px 10px;font-size:13px}
+.track-wrap{position:relative;height:36px;display:flex;align-items:center;margin-bottom:8px}
+.track-bg{position:absolute;left:0;right:0;height:4px;border-radius:2px;background:#e5e5e5}
+.track-fill{position:absolute;height:4px;border-radius:2px;background:#e8052b;pointer-events:none}
+.sthumb{position:absolute;width:20px;height:20px;border-radius:50%;background:#fff;border:2px solid #e8052b;cursor:grab;transform:translateX(-50%);top:50%;margin-top:-10px;z-index:2;touch-action:none}
+.sthumb:active{cursor:grabbing;box-shadow:0 0 0 4px rgba(232,5,43,.15)}
+.slider-ticks{display:flex;justify-content:space-between;font-size:11px;color:#999;margin-bottom:0}
 </style>
 </head>
 <body>
@@ -103,6 +118,23 @@ body{font-family:system-ui,sans-serif;background:#f8f8f6;color:#1a1a1a;padding:1
 </div>
 
 <div id="stage-hd"></div>
+<div class="slider-panel" id="slider-panel">
+  <div class="slider-panel-title">Limites des buckets de couleur</div>
+  <div class="slider-val-row">
+    <span>Top 15</span>
+    <span class="slider-badge" id="sv1">3 min</span>
+    <span>Distancés</span>
+    <span class="slider-badge" id="sv2">15 min</span>
+    <span>Hors course</span>
+  </div>
+  <div class="track-wrap" id="track-wrap">
+    <div class="track-bg"></div>
+    <div class="track-fill" id="track-fill"></div>
+    <div class="sthumb" id="sthumb1"></div>
+    <div class="sthumb" id="sthumb2"></div>
+  </div>
+  <div class="slider-ticks"><span>1 min</span><span>5</span><span>10</span><span>15</span><span>20 min</span></div>
+</div>
 
 <div class="tabs">
   <button class="tab active" onclick="showTab('classement',this)">Classement</button>
@@ -134,9 +166,9 @@ body{font-family:system-ui,sans-serif;background:#f8f8f6;color:#1a1a1a;padding:1
       <strong style="width:100%;margin-bottom:2px">Code couleur :</strong>
       <div class="legend-item"><div class="legend-dot" style="background:#dcfce7"></div> Top 10</div>
       <div class="legend-item"><div class="legend-dot" style="background:#f0fdf4;border:1px solid #bbf7d0"></div> 11e–15e place</div>
-      <div class="legend-item"><div class="legend-dot" style="background:#fef9c3"></div> À moins de 3 min de la 15e place</div>
-      <div class="legend-item"><div class="legend-dot" style="background:#ffedd5"></div> Distancés (3–15 min)</div>
-      <div class="legend-item"><div class="legend-dot" style="background:#fee2e2"></div> À plus de 15 min</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#fef9c3"></div> À moins de <span id="leg1">3</span> min de la 15e place</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#ffedd5"></div> Distancés (<span id="leg2a">3</span>–<span id="leg2b">15</span> min)</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#fee2e2"></div> À plus de <span id="leg3">15</span> min</div>
       <div class="legend-item"><div class="legend-dot" style="background:#f3f4f6;border:1px solid #ddd"></div> Hors course (DNF)</div>
     </div>
   </div>
@@ -148,6 +180,15 @@ body{font-family:system-ui,sans-serif;background:#f8f8f6;color:#1a1a1a;padding:1
 // CONFIG
 // ═══════════════════════════════════════════════════════════════
 const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbzU8b3JYEPFHg-dA9YO83hHBR_ktnJ_ao_jbeironp1VyqrDtTz2b113EtjpG62i6nf/exec';
+
+// Limites buckets en minutes (persistées dans localStorage)
+var limB1 = 3, limB2 = 15;
+try {
+  var s1 = parseInt(localStorage.getItem('giro_lim1'));
+  var s2 = parseInt(localStorage.getItem('giro_lim2'));
+  if(!isNaN(s1) && s1 >= 1 && s1 < 20) limB1 = s1;
+  if(!isNaN(s2) && s2 > 1 && s2 <= 20) limB2 = s2;
+} catch(e) {}
 
 // ═══════════════════════════════════════════════════════════════
 // DONNÉES STATIQUES
@@ -354,9 +395,9 @@ function rowClass(row, stageData){
   if(row.gapSec === null) return 'row-lost';
   const g = gapVs15(row.gapSec, stageData);
   if(g === null) return '';
-  if(g < 0)   return 'row-top15';
-  if(g < 180) return 'row-near15';
-  if(g < 900) return 'row-far15';
+  if(g < 0)           return 'row-top15';
+  if(g < limB1 * 60) return 'row-near15';
+  if(g < limB2 * 60) return 'row-far15';
   return 'row-lost';
 }
 
@@ -444,7 +485,9 @@ function renderStageHeader(n){
         <span class="stype ${s.type}">${s.label}</span>
       </div>
     </div>
+    <button class="param-btn" id="param-btn" onclick="toggleSlider()" aria-label="Réglage des limites"><i class="ti ti-adjustments-horizontal" aria-hidden="true" style="font-size:18px"></i></button>
   </div>`;
+  initSlider();
 }
 
 function renderAll(){
@@ -482,8 +525,8 @@ function renderAll(){
       <div class="pc-sub">points · cliquer pour détail</div>
       <div class="pc-buckets">
         <div class="bucket b-green" ><div class="bucket-val">${b.top15}</div><div class="bucket-lbl">Dans le top 15</div></div>
-        <div class="bucket b-lime"  ><div class="bucket-val">${b.near}</div><div class="bucket-lbl">À &lt;3 min du top 15</div></div>
-        <div class="bucket b-orange"><div class="bucket-val">${b.far}</div><div class="bucket-lbl">Distancés (3–15 min)</div></div>
+        <div class="bucket b-lime"  ><div class="bucket-val">${b.near}</div><div class="bucket-lbl">À &lt;${limB1} min du top 15</div></div>
+        <div class="bucket b-orange"><div class="bucket-val">${b.far}</div><div class="bucket-lbl">Distancés (${limB1}–${limB2} min)</div></div>
         <div class="bucket b-red"   ><div class="bucket-val">${b.out}</div><div class="bucket-lbl">Abandons / &gt;15 min</div></div>
       </div>
     </div>`;
@@ -622,8 +665,80 @@ STAGES.forEach(s => {
   sel.appendChild(o);
 });
 
+// ═══════════════════════════════════════════════════════════════
+// SLIDER LIMITES
+// ═══════════════════════════════════════════════════════════════
+var SLIM_MIN = 1, SLIM_MAX = 20;
+
+function pct(v){ return (v - SLIM_MIN) / (SLIM_MAX - SLIM_MIN) * 100; }
+
+function sliderRender(){
+  var tw = document.getElementById('track-wrap');
+  if(!tw) return;
+  var t1 = document.getElementById('sthumb1');
+  var t2 = document.getElementById('sthumb2');
+  var tf = document.getElementById('track-fill');
+  t1.style.left = pct(limB1) + '%';
+  t2.style.left = pct(limB2) + '%';
+  tf.style.left  = pct(limB1) + '%';
+  tf.style.width = (pct(limB2) - pct(limB1)) + '%';
+  document.getElementById('sv1').textContent = limB1 + ' min';
+  document.getElementById('sv2').textContent = limB2 + ' min';
+  // Mettre à jour la légende si visible
+  var l1=document.getElementById('leg1');
+  if(l1){ l1.textContent=limB1; document.getElementById('leg2a').textContent=limB1; document.getElementById('leg2b').textContent=limB2; document.getElementById('leg3').textContent=limB2; }
+}
+
+function sliderValFromX(x){
+  var rect = document.getElementById('track-wrap').getBoundingClientRect();
+  var ratio = Math.max(0, Math.min(1, (x - rect.left) / rect.width));
+  return Math.round(SLIM_MIN + ratio * (SLIM_MAX - SLIM_MIN));
+}
+
+function sliderDrag(which){
+  function move(e){
+    var x = e.touches ? e.touches[0].clientX : e.clientX;
+    var v = sliderValFromX(x);
+    if(which === 1){ limB1 = Math.min(v, limB2 - 1); limB1 = Math.max(SLIM_MIN, limB1); }
+    else           { limB2 = Math.max(v, limB1 + 1); limB2 = Math.min(SLIM_MAX, limB2); }
+    sliderRender();
+    renderAll();
+  }
+  function up(){
+    document.removeEventListener('mousemove', move);
+    document.removeEventListener('mouseup', up);
+    document.removeEventListener('touchmove', move);
+    document.removeEventListener('touchend', up);
+    try{ localStorage.setItem('giro_lim1', limB1); localStorage.setItem('giro_lim2', limB2); }catch(e){}
+  }
+  document.addEventListener('mousemove', move);
+  document.addEventListener('mouseup', up);
+  document.addEventListener('touchmove', move, {passive:true});
+  document.addEventListener('touchend', up);
+}
+
+function initSlider(){
+  var t1 = document.getElementById('sthumb1');
+  var t2 = document.getElementById('sthumb2');
+  if(!t1 || !t2) return;
+  t1.addEventListener('mousedown',  function(){ sliderDrag(1); });
+  t1.addEventListener('touchstart', function(){ sliderDrag(1); }, {passive:true});
+  t2.addEventListener('mousedown',  function(){ sliderDrag(2); });
+  t2.addEventListener('touchstart', function(){ sliderDrag(2); }, {passive:true});
+  sliderRender();
+}
+
+function toggleSlider(){
+  var p   = document.getElementById('slider-panel');
+  var btn = document.getElementById('param-btn');
+  p.classList.toggle('open');
+  if(btn) btn.classList.toggle('active', p.classList.contains('open'));
+  sliderRender();
+}
+
 // Lancement
 loadAllStages();
+
 </script>
 </body>
 </html>
