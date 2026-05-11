@@ -517,7 +517,7 @@ function renderPronoList(){
       ? '<span class="rtag">réserviste actif</span>' : '';
     pl.innerHTML += `<div class="pcard" onclick="showDetailFromProno('${name}')">
       <div class="pc-head"><span class="pc-name">${name}${tag}</span>›</div>
-      <div style="font-size:13px;color:#666">${d.total.toFixed(1)} pts</div>
+      <div style="font-size:13px;color:#666">${Math.floor(d.total)} pts</div>
     </div>`;
   });
   document.getElementById('prono-list').style.display = '';
