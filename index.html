@@ -59,7 +59,7 @@ body{font-family:system-ui,sans-serif;background:#f8f8f6;color:#1a1a1a;padding:1
 .tbl tr:hover td{background:#fafafa}
 .pb{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;font-size:12px;font-weight:500}
 .p1{background:#fef9c3;color:#854d0e}.p2{background:#f1f5f9;color:#334155}.p3{background:#fff7ed;color:#92400e}.pN{background:#f0f0f0;color:#666}
-.ptag{font-size:11px;padding:2px 8px;border-radius:20px;background:#fde8ec;color:#9b1c1c;margin-left:6px}
+.ptag{font-size:10px;padding:1px 5px;border-radius:20px;background:#fde8ec;color:#9b1c1c;margin-left:4px;white-space:normal;word-break:break-word}
 .dnftag{font-size:11px;padding:2px 7px;border-radius:20px;background:#f3f4f6;color:#666;margin-left:6px}
 .back-btn{display:flex;align-items:center;gap:10px;margin-bottom:1.5rem;cursor:pointer;color:#666;font-size:14px}
 .back-btn:hover{color:#1a1a1a}
@@ -116,7 +116,6 @@ body{font-family:system-ui,sans-serif;background:#f8f8f6;color:#1a1a1a;padding:1
     <div class="sync-dot loading" id="sdot"></div>
     <span id="stxt">Chargement…</span>
   </div>
-  <button class="sync-btn" onclick="loadAllStages()">&#8635; Actualiser</button>
 </div>
 
 <div class="tabs">
@@ -496,7 +495,7 @@ function renderAll(){
     cards.innerHTML += `
     <div class="pcard${idx===0?' gold':''}" onclick="showDetail('${name}')">
       <div class="pc-head"><span class="pc-name">${name}</span><span class="rb ${rc}">${idx+1}</span></div>
-      <div class="pc-pts">${data.total.toFixed(1)}</div>
+      <div class="pc-pts">${Math.floor(data.total)}</div>
       <div class="pc-sub">points · cliquer pour détail</div>
       <div class="pc-buckets">
         <div class="bucket b-green" ><div class="bucket-val">${b.top15}</div><div class="bucket-lbl">Dans le top 15</div></div>
@@ -566,7 +565,7 @@ function showDetail(name){
     </tr>`;
   });
 
-  tb.innerHTML += `<tr class="tot-row"><td colspan="3">Total</td><td>${(Math.round(tot*10)/10).toFixed(1)}</td></tr>`;
+  tb.innerHTML += `<tr class="tot-row"><td colspan="3">Total</td><td>${Math.floor(tot)}</td></tr>`;
 
   // Ligne réserviste avec code couleur
   if(sd){
@@ -611,6 +610,7 @@ function showDetailFromProno(name){ showDetail(name); }
 function backList(){
   document.getElementById('prono-list').style.display = '';
   document.getElementById('prono-detail').classList.remove('active');
+  showTab('classement', document.querySelectorAll('.tab')[0]);
 }
 function showTab(tab, btn){
   curTab = tab;
