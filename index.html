@@ -84,13 +84,6 @@ body{font-family:system-ui,sans-serif;background:#f8f8f6;color:#1a1a1a;padding:1
 .detail-view{display:none}.detail-view.active{display:block}
 .alert{background:#fef3c7;border:1px solid #fde68a;border-radius:8px;padding:10px 14px;font-size:13px;color:#92400e;margin-bottom:.75rem}
 .alert-info{background:#f8f8f6;border-radius:8px;padding:10px 14px;font-size:13px;color:#666;margin-bottom:.75rem}
-.sync-bar{display:flex;align-items:center;justify-content:space-between;background:#f0f0ee;border-radius:8px;padding:8px 14px;margin-bottom:1.25rem;font-size:12px;color:#666;gap:10px;flex-wrap:wrap}
-.sync-dot{width:8px;height:8px;border-radius:50%;background:#22c55e;flex-shrink:0}
-.sync-dot.loading{background:#f59e0b;animation:pulse 1s infinite}
-.sync-dot.error{background:#e8052b}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
-.sync-btn{font-size:12px;padding:4px 10px;cursor:pointer;border-radius:6px;border:1px solid #ddd;background:#fff;color:#333;white-space:nowrap}
-.sync-btn:hover{background:#f0f0f0}
 </style>
 </head>
 <body>
@@ -110,13 +103,6 @@ body{font-family:system-ui,sans-serif;background:#f8f8f6;color:#1a1a1a;padding:1
 </div>
 
 <div id="stage-hd"></div>
-
-<div class="sync-bar">
-  <div style="display:flex;align-items:center;gap:8px">
-    <div class="sync-dot loading" id="sdot"></div>
-    <span id="stxt">Chargement…</span>
-  </div>
-</div>
 
 <div class="tabs">
   <button class="tab active" onclick="showTab('classement',this)">Classement</button>
@@ -390,10 +376,7 @@ function getBuckets(rows, stageData){
 // CHARGEMENT DEPUIS GOOGLE SHEETS
 // ═══════════════════════════════════════════════════════════════
 function setSync(state, msg){
-  const dot = document.getElementById('sdot');
-  const txt = document.getElementById('stxt');
-  dot.className = 'sync-dot' + (state==='loading'?' loading':state==='error'?' error':'');
-  txt.textContent = msg;
+  console.log('[Giro2026]', state, msg);
 }
 
 async function loadAllStages(){
