@@ -87,6 +87,7 @@ body{font-family:system-ui,sans-serif;background:#f8f8f6;color:#1a1a1a;padding:1
 .conditions-box ul{list-style:none;display:flex;flex-direction:column;gap:5px;padding:0}
 .conditions-box li::before{content:"— ";color:#e8052b}
 .conditions-box .cond-none{color:#999;font-style:italic}
+.probable-tip{border-bottom:1px dotted #999;cursor:help;font-style:normal}
 .detail-view{display:none}.detail-view.active{display:block}
 .alert{background:#fef3c7;border:1px solid #fde68a;border-radius:8px;padding:10px 14px;font-size:13px;color:#92400e;margin-bottom:.75rem}
 .alert-info{background:#f8f8f6;border-radius:8px;padding:10px 14px;font-size:13px;color:#666;margin-bottom:.75rem}
@@ -695,7 +696,7 @@ function renderAll(){
         <div class="bucket b-green" ><div class="bucket-val">${b.top15}</div><div class="bucket-lbl">Dans le top 15</div></div>
         <div class="bucket b-lime"  ><div class="bucket-val">${b.near}</div><div class="bucket-lbl">À &lt;${limB1} min du top 15</div></div>
         <div class="bucket b-orange"><div class="bucket-val">${b.far}</div><div class="bucket-lbl">Distancés (${limB1}–${limB2} min)</div></div>
-        <div class="bucket b-red"   ><div class="bucket-val">${b.out}</div><div class="bucket-lbl">Abandons / &gt;15 min</div></div>
+        <div class="bucket b-red"   ><div class="bucket-val">${b.out}</div><div class="bucket-lbl">Abandons / &gt;${limB2} min</div></div>
       </div>
     </div>`;
   });
@@ -791,9 +792,8 @@ function showDetail(name){
   }
 
   // Bandeau conditions "passer en tête"
-  // Supprimer l'ancien bandeau s'il existe
-  const oldCond = document.getElementById('cond-box-' + name);
-  if(oldCond) oldCond.remove();
+  // Supprimer tous les bandeaux conditions existants
+  document.querySelectorAll('.conditions-box').forEach(el => el.remove());
 
   const sorted = Object.entries(curScores).sort((a,b) => b[1].total - a[1].total);
   const isLeader = sorted[0][0] === name;
@@ -806,17 +806,18 @@ function showDetail(name){
   } else {
     const conds = conditionsMap[name] || [];
     if(conds.length === 0){
-      condBox.innerHTML = `<div class="cond-none">Il n'y a pas de condition crédible à un coureur pour que ${name} prenne la tête du concours.</div>`;
+      condBox.innerHTML = `<div class="cond-none">Il n'y a pas de condition <span class="probable-tip" title="Gain max. de 5 places ou sortie du top 15 pour un seul coureur">probable</span> à un coureur pour que ${name} prenne la tête du concours.</div>`;
     } else {
       const items = conds.map(cd => {
-        const timeStr = cd.timeDelta !== null ? ' (' + formatTimeDelta(cd.timeDelta) + ' au général)' : '';
+        const tStr = formatTimeDelta(cd.timeDelta);
+        const timeStr = tStr ? ' (' + tStr + ' au général)' : '';
         if(cd.direction === 'recule'){
           return `<li>${cd.coureur} recule au moins à la ${cd.posTo}e place${timeStr}</li>`;
         } else {
           return `<li>${cd.coureur} progresse au moins à la ${cd.posTo}e place${timeStr}</li>`;
         }
       });
-      condBox.innerHTML = `<div class="cond-title">${name} prend la tête si l'une de ces conditions se réalise :</div><ul>${items.join('')}</ul>`;
+      condBox.innerHTML = `<div class="cond-title">${name} prend la tête si l'une de ces conditions <span class="probable-tip" title="Gain max. de 5 places ou sortie du top 15 pour un seul coureur">probables</span> se réalise :</div><ul>${items.join('')}</ul>`;
     }
     // Insérer après la légende
     const legend = document.querySelector('#prono-detail .legend');
