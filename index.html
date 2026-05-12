@@ -82,6 +82,11 @@ body{font-family:system-ui,sans-serif;background:#f8f8f6;color:#1a1a1a;padding:1
 .legend-item{display:flex;align-items:center;gap:5px}
 .legend-dot{width:12px;height:12px;border-radius:3px;flex-shrink:0}
 .no-data{text-align:center;padding:2rem;color:#666;font-size:14px;grid-column:1/-1}
+.conditions-box{margin-top:1rem;padding:12px 14px;background:#f8f8f6;border:1px solid #e5e5e5;border-radius:8px;font-size:13px;color:#555}
+.conditions-box .cond-title{font-weight:500;color:#1a1a1a;margin-bottom:8px}
+.conditions-box ul{list-style:none;display:flex;flex-direction:column;gap:5px;padding:0}
+.conditions-box li::before{content:"— ";color:#e8052b}
+.conditions-box .cond-none{color:#999;font-style:italic}
 .detail-view{display:none}.detail-view.active{display:block}
 .alert{background:#fef3c7;border:1px solid #fde68a;border-radius:8px;padding:10px 14px;font-size:13px;color:#92400e;margin-bottom:.75rem}
 .alert-info{background:#f8f8f6;border-radius:8px;padding:10px 14px;font-size:13px;color:#666;margin-bottom:.75rem}
@@ -237,6 +242,7 @@ let curStage   = 1;
 let curTab     = 'classement';
 let curScores  = {};
 let lastAvail  = 0;   // dernière étape disponible
+let conditionsMap = {}; // {nomJoueur: [{coureur, direction, posFrom, posTo, timeDelta, newLeader}]}
 
 // ═══════════════════════════════════════════════════════════════
 // CORRESPONDANCE DES NOMS
@@ -414,6 +420,164 @@ function getBuckets(rows, stageData){
 }
 
 // ═══════════════════════════════════════════════════════════════
+// SIMULATION POUR CONDITIONS "PASSER EN TÊTE"
+// ═══════════════════════════════════════════════════════════════
+
+// Recalcule les scores sur un GC simulé (même DNF que l'étape réelle)
+function computeScoresOnGC(gc, dnf){
+  const out = {};
+  for(const [name] of Object.entries(PRONOSTICS)){
+    const {list, resActif, replacedName} = applyRules(name, dnf);
+    let total = 0;
+    list.forEach((coureur, i) => {
+      const isAbandoned = isDNF(coureur, dnf);
+      const entry = gc.find(r => sameRider(r.name, coureur));
+      const gcPos = (!isAbandoned && entry) ? entry.pos : null;
+      const mult  = MULTS[i];
+      const pts   = (gcPos && PTS_GC[gcPos]) ? PTS_GC[gcPos] : 0;
+      total += pts * mult;
+    });
+    out[name] = Math.round(total * 10) / 10;
+  }
+  return out;
+}
+
+// Retourne le nom du leader des participants pour des scores donnés
+function getLeader(scores){
+  return Object.entries(scores).sort((a,b) => b[1] - a[1])[0][0];
+}
+
+// Simule un déplacement d'un coureur dans le GC et retourne le GC modifié
+// direction: +N = gagne N rangs (monte), -N = perd N rangs (descend)
+// On ne modifie que les 16 premières positions (impact mathématique limité)
+function simulateGC(gc, coureurName, delta){
+  const sim = gc.map(r => ({...r})); // copie superficielle
+  const idx = sim.findIndex(r => sameRider(r.name, coureurName));
+  if(idx === -1) return sim;
+
+  const curPos = sim[idx].pos;
+  const newPos = Math.max(1, curPos - delta); // delta>0 = monte = pos diminue
+  if(newPos === curPos) return sim;
+
+  // Décaler les coureurs entre les deux positions
+  if(delta > 0){
+    // Le coureur monte : ceux entre newPos et curPos-1 descendent d'un rang
+    sim.forEach(r => {
+      if(r.pos >= newPos && r.pos < curPos && !sameRider(r.name, coureurName))
+        r.pos += 1;
+    });
+  } else {
+    // Le coureur descend : ceux entre curPos+1 et newPos montent d'un rang
+    sim.forEach(r => {
+      if(r.pos > curPos && r.pos <= newPos && !sameRider(r.name, coureurName))
+        r.pos -= 1;
+    });
+  }
+  sim[idx].pos = newPos;
+  sim.sort((a,b) => a.pos - b.pos);
+  return sim;
+}
+
+// Arrondit un écart en secondes par tranche de 5s, retourne une string lisible
+function formatTimeDelta(sec){
+  if(sec === null || sec === undefined) return '';
+  const abs = Math.abs(sec);
+  const rounded = Math.round(abs / 5) * 5;
+  if(rounded === 0) return '';
+  const m = Math.floor(rounded / 60);
+  const s = rounded % 60;
+  if(m === 0) return `~${s}s`;
+  if(s === 0) return `~${m}min`;
+  return `~${m}min${s}s`;
+}
+
+// Calcule toutes les conditions "passer en tête" pour la dernière étape
+function computeConditions(sd){
+  conditionsMap = {};
+  if(!sd || !sd.gc || sd.gc.length === 0) return;
+
+  const realScores = computeScoresOnGC(sd.gc, sd.dnf);
+  const currentLeader = getLeader(realScores);
+
+  // Initialiser un tableau vide pour chaque non-leader
+  for(const name of Object.keys(PRONOSTICS)){
+    if(name !== currentLeader) conditionsMap[name] = [];
+  }
+
+  // ── Phase 1 : reculs (positions 1 à 15, de -1 à -15 rangs) ──
+  for(let fromPos = 1; fromPos <= 15; fromPos++){
+    const coureurEntry = sd.gc.find(r => r.pos === fromPos);
+    if(!coureurEntry) continue;
+    const coureurName = coureurEntry.name;
+
+    // Simuler jusqu'à sortie du top 15 (-1 à -(15-fromPos+1) rangs max)
+    const maxDelta = 16 - fromPos; // au maximum jusqu'à la position 16
+    let prevLeader = currentLeader;
+
+    for(let delta = 1; delta <= maxDelta; delta++){
+      const simGC  = simulateGC(sd.gc, coureurName, -delta);
+      const simScores = computeScoresOnGC(simGC, sd.dnf);
+      const newLeader = getLeader(simScores);
+
+      if(newLeader !== prevLeader){
+        // Changement de leader à ce seuil
+        const toPos = fromPos + delta;
+        // Écart de temps : gapSec de toPos - gapSec de fromPos
+        const toPosEntry = sd.gc.find(r => r.pos === toPos);
+        const timeDelta = toPosEntry ? toPosEntry.gapSec - coureurEntry.gapSec : null;
+
+        if(newLeader !== currentLeader && conditionsMap[newLeader] !== undefined){
+          conditionsMap[newLeader].push({
+            coureur: coureurName,
+            direction: 'recule',
+            posFrom: fromPos,
+            posTo:   toPos,
+            timeDelta: timeDelta,
+            prevLeader: currentLeader
+          });
+        }
+        prevLeader = newLeader;
+      }
+    }
+  }
+
+  // ── Phase 2 : gains (positions 2 à 20, de +1 à +5 rangs) ─────
+  for(let fromPos = 2; fromPos <= 20; fromPos++){
+    const coureurEntry = sd.gc.find(r => r.pos === fromPos);
+    if(!coureurEntry) continue;
+    const coureurName = coureurEntry.name;
+
+    const maxDelta = Math.min(5, fromPos - 1); // ne peut pas dépasser la 1ère place
+    let prevLeader = currentLeader;
+
+    for(let delta = 1; delta <= maxDelta; delta++){
+      const simGC  = simulateGC(sd.gc, coureurName, delta);
+      const simScores = computeScoresOnGC(simGC, sd.dnf);
+      const newLeader = getLeader(simScores);
+
+      if(newLeader !== prevLeader){
+        const toPos = fromPos - delta;
+        // Écart de temps : gapSec de fromPos - gapSec de toPos (positif = gain)
+        const toPosEntry = sd.gc.find(r => r.pos === toPos);
+        const timeDelta = toPosEntry ? coureurEntry.gapSec - toPosEntry.gapSec : null;
+
+        if(newLeader !== currentLeader && conditionsMap[newLeader] !== undefined){
+          conditionsMap[newLeader].push({
+            coureur: coureurName,
+            direction: 'gagne',
+            posFrom: fromPos,
+            posTo:   toPos,
+            timeDelta: timeDelta,
+            prevLeader: currentLeader
+          });
+        }
+        prevLeader = newLeader;
+      }
+    }
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
 // CHARGEMENT DEPUIS GOOGLE SHEETS
 // ═══════════════════════════════════════════════════════════════
 function setSync(state, msg){
@@ -508,6 +672,10 @@ function renderAll(){
   const scores = computeScores(sd);
   curScores = scores;
   const sorted = Object.entries(scores).sort((a,b) => b[1].total - a[1].total);
+
+  // Calcul des conditions "passer en tête" uniquement pour la dernière étape disponible
+  if(curStage === lastAvail) computeConditions(sd);
+  else conditionsMap = {};
 
   // Alertes réserviste supprimées — info disponible dans le détail
   document.getElementById('alerts').innerHTML = '';
@@ -620,6 +788,39 @@ function showDetail(name){
     tb.innerHTML += `<tr class="replaced-row">
       <td colspan="4" style="padding:7px 12px">↳ Remplace (${replacedRank}) ${data.replacedName} (Hors course)</td>
     </tr>`;
+  }
+
+  // Bandeau conditions "passer en tête"
+  // Supprimer l'ancien bandeau s'il existe
+  const oldCond = document.getElementById('cond-box-' + name);
+  if(oldCond) oldCond.remove();
+
+  const sorted = Object.entries(curScores).sort((a,b) => b[1].total - a[1].total);
+  const isLeader = sorted[0][0] === name;
+  const condBox = document.createElement('div');
+  condBox.className = 'conditions-box';
+  condBox.id = 'cond-box-' + name;
+
+  if(isLeader || curStage !== lastAvail){
+    // Pas de bandeau pour le leader ou pour les étapes historiques
+  } else {
+    const conds = conditionsMap[name] || [];
+    if(conds.length === 0){
+      condBox.innerHTML = `<div class="cond-none">Il n'y a pas de condition crédible à un coureur pour que ${name} prenne la tête du concours.</div>`;
+    } else {
+      const items = conds.map(cd => {
+        const timeStr = cd.timeDelta !== null ? ' (' + formatTimeDelta(cd.timeDelta) + ' au général)' : '';
+        if(cd.direction === 'recule'){
+          return `<li>${cd.coureur} recule au moins à la ${cd.posTo}e place${timeStr}</li>`;
+        } else {
+          return `<li>${cd.coureur} progresse au moins à la ${cd.posTo}e place${timeStr}</li>`;
+        }
+      });
+      condBox.innerHTML = `<div class="cond-title">${name} prend la tête si l'une de ces conditions se réalise :</div><ul>${items.join('')}</ul>`;
+    }
+    // Insérer après la légende
+    const legend = document.querySelector('#prono-detail .legend');
+    if(legend) legend.after(condBox);
   }
 
   if(curTab === 'pronostics'){
