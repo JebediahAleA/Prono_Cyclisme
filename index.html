@@ -423,16 +423,29 @@ function getBuckets(rows, stageData){
 // SIMULATION POUR CONDITIONS "PASSER EN TÊTE"
 // ═══════════════════════════════════════════════════════════════
 
-// Recalcule les scores sur un GC simulé (même DNF que l'étape réelle)
-function computeScoresOnGC(gc, dnf){
+// Précalcule un index {nomPronostic → pos} depuis un GC pour accès O(1)
+function buildGCIndex(gc){
+  const index = new Map();
+  const allNames = new Set(
+    Object.values(PRONOSTICS).flatMap(p => [...p.top10, p.res])
+  );
+  for(const proName of allNames){
+    const entry = gc.find(r => sameRider(r.name, proName));
+    if(entry) index.set(proName, entry.pos);
+  }
+  return index;
+}
+
+// Recalcule les scores sur un GC simulé via un index précalculé
+function computeScoresOnGC(gc, dnf, gcIndex){
+  if(!gcIndex) gcIndex = buildGCIndex(gc);
   const out = {};
   for(const [name] of Object.entries(PRONOSTICS)){
-    const {list, resActif, replacedName} = applyRules(name, dnf);
+    const {list} = applyRules(name, dnf);
     let total = 0;
     list.forEach((coureur, i) => {
       const isAbandoned = isDNF(coureur, dnf);
-      const entry = gc.find(r => sameRider(r.name, coureur));
-      const gcPos = (!isAbandoned && entry) ? entry.pos : null;
+      const gcPos = (!isAbandoned) ? gcIndex.get(coureur) : null;
       const mult  = MULTS[i];
       const pts   = (gcPos && PTS_GC[gcPos]) ? PTS_GC[gcPos] : 0;
       total += pts * mult;
@@ -496,9 +509,11 @@ function computeConditions(sd){
   conditionsMap = {};
   if(!sd || !sd.gc || sd.gc.length === 0) return;
 
-  const realScores = computeScoresOnGC(sd.gc, sd.dnf);
+  // Précalculer l'index de correspondance noms une seule fois
+  const baseIndex = buildGCIndex(sd.gc);
+  const realScores = computeScoresOnGC(sd.gc, sd.dnf, baseIndex);
   const currentLeader = getLeader(realScores);
-
+  
   // Initialiser un tableau vide pour chaque non-leader
   for(const name of Object.keys(PRONOSTICS)){
     if(name !== currentLeader) conditionsMap[name] = [];
@@ -516,7 +531,7 @@ function computeConditions(sd){
 
     for(let delta = 1; delta <= maxDelta; delta++){
       const simGC  = simulateGC(sd.gc, coureurName, -delta);
-      const simScores = computeScoresOnGC(simGC, sd.dnf);
+      const simScores = computeScoresOnGC(simGC, sd.dnf, buildGCIndex(simGC));
       const newLeader = getLeader(simScores);
 
       if(newLeader !== prevLeader){
@@ -552,7 +567,7 @@ function computeConditions(sd){
 
     for(let delta = 1; delta <= maxDelta; delta++){
       const simGC  = simulateGC(sd.gc, coureurName, delta);
-      const simScores = computeScoresOnGC(simGC, sd.dnf);
+      const simScores = computeScoresOnGC(simGC, sd.dnf, buildGCIndex(simGC));
       const newLeader = getLeader(simScores);
 
       if(newLeader !== prevLeader){
@@ -801,7 +816,7 @@ function showDetail(name){
   } else {
     const conds = conditionsMap[name] || [];
     if(conds.length === 0){
-      condBox.innerHTML = `<div class="cond-none">Il n'y a pas de condition <span class="probable-tip" title="Gain max. de 5 places ou sortie du top 15 pour un seul coureur">probable</span> à un coureur pour que ${name} prenne la tête du concours.</div>`;
+      condBox.innerHTML = `<div class="cond-none">Il n'y a pas de condition <span class="probable-tip" >probable</span> à un coureur pour que ${name} prenne la tête du concours.</div>`;
     } else {
       const items = conds.map(cd => {
         const tStr = formatTimeDelta(cd.timeDelta);
@@ -812,7 +827,7 @@ function showDetail(name){
           return `<li>${cd.coureur} progresse au moins à la ${cd.posTo}e place${timeStr}</li>`;
         }
       });
-      condBox.innerHTML = `<div class="cond-title">${name} prend la tête si l'une de ces conditions <span class="probable-tip" title="Gain max. de 5 places ou sortie du top 15 pour un seul coureur">probables</span> se réalise :</div><ul>${items.join('')}</ul>`;
+      condBox.innerHTML = `<div class="cond-title">${name} prend la tête si l'une de ces conditions <span class="probable-tip" >probables</span> se réalise :</div><ul>${items.join('')}</ul>`;
     }
     // Insérer après la légende
     const legend = document.querySelector('#prono-detail .legend');
