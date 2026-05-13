@@ -87,10 +87,10 @@ body{font-family:system-ui,sans-serif;background:#f8f8f6;color:#1a1a1a;padding:1
 .conditions-box ul{list-style:none;display:flex;flex-direction:column;gap:5px;padding:0}
 .conditions-box li::before{content:"— ";color:#e8052b}
 .conditions-box .cond-none{color:#999;font-style:italic}
-.probable-tip{border-bottom:1px dotted #999;cursor:help;font-style:normal}
+.probable-tip{border-bottom:1px dotted #999;cursor:help;font-style:normal;position:relative}
+.tip-box{position:fixed;background:#1a1a1a;color:#fff;font-size:11px;padding:6px 10px;border-radius:6px;max-width:220px;line-height:1.4;z-index:999;pointer-events:none;opacity:0;transition:opacity .15s}
+.tip-box.visible{opacity:1}
 .detail-view{display:none}.detail-view.active{display:block}
-.alert{background:#fef3c7;border:1px solid #fde68a;border-radius:8px;padding:10px 14px;font-size:13px;color:#92400e;margin-bottom:.75rem}
-.alert-info{background:#f8f8f6;border-radius:8px;padding:10px 14px;font-size:13px;color:#666;margin-bottom:.75rem}
 .param-btn{font-size:13px;padding:5px 9px;border-radius:8px;border:1px solid #ddd;background:#fff;color:#666;cursor:pointer;display:flex;align-items:center;line-height:1}
 .param-btn:hover{background:#f0f0f0}
 .param-btn.active{color:#e8052b;border-color:#e8052b}
@@ -149,7 +149,6 @@ body{font-family:system-ui,sans-serif;background:#f8f8f6;color:#1a1a1a;padding:1
 </div>
 
 <div id="tab-classement" class="section active">
-  <div id="alerts"></div>
   <div class="grid2" id="cards"></div>
 </div>
 <div id="tab-gc" class="section">
@@ -663,7 +662,6 @@ function renderAll(){
 
   if(!sd){
     const s = STAGES[curStage-1];
-    document.getElementById('alerts').innerHTML = '';
     document.getElementById('cards').innerHTML = `<div class="no-data">Étape non encore disponible<br><span style="font-size:12px">${s.date} · ${s.dep} → ${s.arr}</span></div>`;
     document.getElementById('gc-body').innerHTML = `<tr><td colspan="4" class="no-data">Résultats à venir</td></tr>`;
     document.getElementById('prono-list').innerHTML = `<div class="no-data">Résultats à venir</div>`;
@@ -677,9 +675,6 @@ function renderAll(){
   // Calcul des conditions "passer en tête" uniquement pour la dernière étape disponible
   if(curStage === lastAvail) computeConditions(sd);
   else conditionsMap = {};
-
-  // Alertes réserviste supprimées — info disponible dans le détail
-  document.getElementById('alerts').innerHTML = '';
 
   // Cartes classement
   const cards = document.getElementById('cards');
@@ -937,6 +932,36 @@ function toggleSlider(){
   if(btn) btn.classList.toggle('active', p.classList.contains('open'));
   sliderRender();
 }
+
+// Tooltip "probable" — compatible Safari iOS
+const tipBox = document.createElement('div');
+tipBox.className = 'tip-box';
+tipBox.textContent = 'Gain max. de 5 places ou sortie du top 15 pour un seul coureur';
+document.body.appendChild(tipBox);
+
+document.addEventListener('mouseover', e => {
+  if(e.target.classList.contains('probable-tip')){
+    const r = e.target.getBoundingClientRect();
+    tipBox.style.left = Math.min(r.left, window.innerWidth - 230) + 'px';
+    tipBox.style.top  = (r.bottom + 6) + 'px';
+    tipBox.classList.add('visible');
+  }
+});
+document.addEventListener('mouseout', e => {
+  if(e.target.classList.contains('probable-tip')) tipBox.classList.remove('visible');
+});
+// Tactile (Safari iOS)
+document.addEventListener('touchstart', e => {
+  if(e.target.classList.contains('probable-tip')){
+    const r = e.target.getBoundingClientRect();
+    tipBox.style.left = Math.min(r.left, window.innerWidth - 230) + 'px';
+    tipBox.style.top  = (r.bottom + 6) + 'px';
+    tipBox.classList.add('visible');
+    setTimeout(() => tipBox.classList.remove('visible'), 3000);
+  } else {
+    tipBox.classList.remove('visible');
+  }
+}, {passive: true});
 
 // Lancement
 loadAllStages();
